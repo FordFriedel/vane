@@ -20,6 +20,7 @@ public class Trifles extends Module<Trifles> {
 		new RepairCostLimiter(this);
 		new RecipeUnlock(this);
 		new ChestSorter(this);
+		new DeathListener(this);
 
 		new org.oddlama.vane.trifles.commands.Heads(this);
 
