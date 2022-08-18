@@ -20,9 +20,7 @@ public class DeathListener extends Listener<Trifles> {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void on_player_death(PlayerDeathEvent event) {
-        if(event.getEntity().getKiller() == null) {
-            return;
-        }
+        if(event.getEntity().getKiller() == null) return;
         ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta sm = (SkullMeta) skull.getItemMeta();
         sm.setOwningPlayer(event.getPlayer());
