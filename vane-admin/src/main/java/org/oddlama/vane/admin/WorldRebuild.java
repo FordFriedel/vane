@@ -1,7 +1,7 @@
 package org.oddlama.vane.admin;
 
 import static org.oddlama.vane.util.Nms.set_air_no_drops;
-import static org.oddlama.vane.util.Util.ms_to_ticks;
+import static org.oddlama.vane.util.Conversions.ms_to_ticks;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -178,13 +178,7 @@ public class WorldRebuild extends Listener<Admin> {
 			// Sort by distance to top-most center. Last block will be rebuilt first.
 			final var da = a.getLocation().toVector().subtract(reference_point).lengthSquared();
 			final var db = b.getLocation().toVector().subtract(reference_point).lengthSquared();
-			if (da < db) {
-				return -1;
-			} else if (da > db) {
-				return 1;
-			} else {
-				return 0;
-			}
+			return Double.compare(da, db);
 		}
 	}
 }

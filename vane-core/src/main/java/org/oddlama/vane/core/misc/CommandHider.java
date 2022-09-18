@@ -25,7 +25,7 @@ public class CommandHider extends Listener<Core> {
 			return false;
 		}
 
-		var id = message.substring(1, message.length());
+		var id = message.substring(1);
 		final var space_index = id.indexOf(' ');
 		if (space_index > -1) {
 			id = id.substring(0, space_index);
@@ -34,9 +34,7 @@ public class CommandHider extends Listener<Core> {
 		final var command_map = get_module().getServer().getCommandMap().getKnownCommands();
 		var command = command_map.get(id);
 		if (command != null) {
-			if (!command.testPermissionSilent(player)) {
-				return false;
-			}
+			return command.testPermissionSilent(player);
 		}
 
 		return true;

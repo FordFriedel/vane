@@ -80,9 +80,7 @@ public class ExistingItemConverter extends Listener<Core> {
 				}
 
 				contents[i] = convert_to_custom_item.convertExistingStack(is);
-				contents[i].editMeta(meta -> {
-					meta.displayName(convert_to_custom_item.displayName());
-				});
+				contents[i].editMeta(meta -> meta.displayName(convert_to_custom_item.displayName()));
 				get_module().enchantment_manager.update_enchanted_item(contents[i]);
 				get_module().log.info("Converted legacy item to " + convert_to_custom_item.key());
 				++changed;
@@ -116,7 +114,6 @@ public class ExistingItemConverter extends Listener<Core> {
 				get_module().log.info("Updated item durability " + custom_item.key());
 				DurabilityManager.initialize_or_update_max(custom_item, contents[i]);
 				++changed;
-				continue;
 			}
 		}
 

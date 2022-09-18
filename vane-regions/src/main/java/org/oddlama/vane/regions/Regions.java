@@ -61,7 +61,7 @@ import org.oddlama.vane.regions.region.RegionGroup;
 import org.oddlama.vane.regions.region.RegionSelection;
 import org.oddlama.vane.regions.region.Role;
 import org.oddlama.vane.regions.region.RoleSetting;
-import org.oddlama.vane.util.Util;
+import org.oddlama.vane.util.StorageUtil;
 
 import net.minecraft.core.BlockPos;
 
@@ -411,16 +411,12 @@ public class Regions extends Module<Regions> {
 		// Returns true if this region group is unused and can be removed.
 
 		// If this region group is the fallback default group, it is permanent!
-		if (storage_default_region_group.values().contains(group.id())) {
+		if (storage_default_region_group.containsValue(group.id())) {
 			return false;
 		}
 
 		// If any region uses this group, we can't remove it.
-		if (regions.values().stream().anyMatch(r -> r.region_group_id().equals(group.id()))) {
-			return false;
-		}
-
-		return true;
+		return regions.values().stream().noneMatch(r -> r.region_group_id().equals(group.id()));
 	}
 
 	public void remove_region_group(final RegionGroup group) {
@@ -555,11 +551,7 @@ public class Regions extends Module<Regions> {
 		final var max = region.extent().max();
 
 		final var world_id = min.getWorld().getUID();
-		var regions_in_chunk = regions_in_chunk_in_world.get(world_id);
-		if (regions_in_chunk == null) {
-			regions_in_chunk = new HashMap<Long, List<Region>>();
-			regions_in_chunk_in_world.put(world_id, regions_in_chunk);
-		}
+		var regions_in_chunk = regions_in_chunk_in_world.computeIfAbsent(world_id, k -> new HashMap<>());
 
 		final var min_chunk = min.getChunk();
 		final var max_chunk = max.getChunk();
@@ -568,11 +560,7 @@ public class Regions extends Module<Regions> {
 		for (int cx = min_chunk.getX(); cx <= max_chunk.getX(); ++cx) {
 			for (int cz = min_chunk.getZ(); cz <= max_chunk.getZ(); ++cz) {
 				final var chunk_key = Chunk.getChunkKey(cx, cz);
-				var possible_regions = regions_in_chunk.get(chunk_key);
-				if (possible_regions == null) {
-					possible_regions = new ArrayList<Region>();
-					regions_in_chunk.put(chunk_key, possible_regions);
-				}
+				var possible_regions = regions_in_chunk.computeIfAbsent(chunk_key, k -> new ArrayList<>());
 				possible_regions.add(region);
 			}
 		}
@@ -703,11 +691,11 @@ public class Regions extends Module<Regions> {
 		update_persistent_data(event.getWorld());
 	}
 
-	public static final NamespacedKey STORAGE_REGIONS = Util.namespaced_key("vane_regions", "regions");
+	public static final NamespacedKey STORAGE_REGIONS = StorageUtil.namespaced_key("vane_regions", "regions");
 
 	public void load_persistent_data(final World world) {
 		final var data = world.getPersistentDataContainer();
-		final var storage_region_prefix = STORAGE_REGIONS.toString() + ".";
+		final var storage_region_prefix = STORAGE_REGIONS + ".";
 
 		// Load all currently stored regions.
 		final var pdc_regions = data.getKeys().stream()
@@ -724,7 +712,6 @@ public class Regions extends Module<Regions> {
 				index_region(region);
 			} catch (IOException e) {
 				log.log(Level.SEVERE, "error while serializing persistent data!", e);
-				continue;
 			}
 		}
 		log.log(Level.INFO, "Loaded " + pdc_regions.size() + " regions for world " + world.getName() + "(" + world.getUID() + ")");
@@ -767,7 +754,7 @@ public class Regions extends Module<Regions> {
 
 	public void update_persistent_data(final World world) {
 		final var data = world.getPersistentDataContainer();
-		final var storage_region_prefix = STORAGE_REGIONS.toString() + ".";
+		final var storage_region_prefix = STORAGE_REGIONS + ".";
 
 		// Update invalidated regions
 		regions.values().stream()
@@ -793,9 +780,7 @@ public class Regions extends Module<Regions> {
 			.collect(Collectors.toSet());
 
 		// Remove all regions that no longer exist
-		Sets.difference(stored_regions, regions.keySet()).forEach(id -> {
-			data.remove(NamespacedKey.fromString(storage_region_prefix + id.toString()));
-		});
+		Sets.difference(stored_regions, regions.keySet()).forEach(id -> data.remove(NamespacedKey.fromString(storage_region_prefix + id.toString())));
 	}
 
 	@Override

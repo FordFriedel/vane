@@ -136,9 +136,7 @@ public class Permissions extends Module<Permissions> {
 			sender_attachments.put(sender, attachment);
 
 			final var attached_perms = console_attachment.getPermissions();
-			attached_perms.forEach((p, v) -> {
-				attachment.setPermission(p, v);
-			});
+			attached_perms.forEach((p, v) -> attachment.setPermission(p, v));
 		}
 	}
 
@@ -220,9 +218,7 @@ public class Permissions extends Module<Permissions> {
 		// Clear attachment
 		final var attachment = player_attachments.get(player.getUniqueId());
 		final var attached_perms = attachment.getPermissions();
-		attached_perms.forEach((p, v) -> {
-			attachment.unsetPermission(p);
-		});
+		attached_perms.forEach((p, v) -> attachment.unsetPermission(p));
 
 		// Add permissions again
 		var groups = storage_player_groups.get(player.getUniqueId());
@@ -262,11 +258,7 @@ public class Permissions extends Module<Permissions> {
 	}
 
 	public boolean add_player_to_group(final OfflinePlayer player, final String group) {
-		var set = storage_player_groups.get(player.getUniqueId());
-		if (set == null) {
-			set = new HashSet<String>();
-			storage_player_groups.put(player.getUniqueId(), set);
-		}
+		var set = storage_player_groups.computeIfAbsent(player.getUniqueId(), k -> new HashSet<String>());
 
 		final var added = set.add(group);
 		if (added) {

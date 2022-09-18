@@ -1,12 +1,13 @@
 package org.oddlama.vane.util;
 
 import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 public class LazyLocation {
 
-	private UUID world_id = null;
+	private final UUID world_id;
 	private Location location;
 
 	public LazyLocation(final Location location) {

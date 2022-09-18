@@ -16,7 +16,7 @@ import org.oddlama.vane.core.lang.TranslatedMessage;
 import org.oddlama.vane.core.module.Context;
 import org.oddlama.vane.core.module.Module;
 import org.oddlama.vane.core.resourcepack.ResourcePackGenerator;
-import org.oddlama.vane.util.Util;
+import org.oddlama.vane.util.StorageUtil;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -34,8 +34,8 @@ public class CustomItem<T extends Module<T>> extends Listener<T> implements org.
 
 	@ConfigInt(def = 0, min = 0, desc = "The durability of this item. Set to 0 to use the durability properties of whatever base material the item is made of.")
 	private int config_durability;
-	private String name_override = null;
-	private Integer custom_model_data_override = null;
+	private final String name_override;
+	private final Integer custom_model_data_override;
 
 	public CustomItem(Context<T> context) {
 		this(context, null, null);
@@ -60,7 +60,7 @@ public class CustomItem<T extends Module<T>> extends Listener<T> implements org.
 		context = context.group("item_" + name(), "Enable item " + name());
 		set_context(context);
 
-		this.key = Util.namespaced_key(get_module().namespace(), name());
+		this.key = StorageUtil.namespaced_key(get_module().namespace(), name());
 		recipes = new Recipes<T>(get_context(), this.key, this::default_recipes);
 		loot_tables = new LootTables<T>(get_context(), this.key, this::default_loot_tables);
 
@@ -134,8 +134,6 @@ public class CustomItem<T extends Module<T>> extends Listener<T> implements org.
 			throw new RuntimeException("Missing resource '" + resource_name + "'. This is a bug.");
 		}
 		rp.add_item_model(key(), resource);
-		rp.add_item_override(baseMaterial().getKey(), key(), predicate -> {
-			predicate.put("custom_model_data", customModelData());
-		});
+		rp.add_item_override(baseMaterial().getKey(), key(), predicate -> predicate.put("custom_model_data", customModelData()));
 	}
 }

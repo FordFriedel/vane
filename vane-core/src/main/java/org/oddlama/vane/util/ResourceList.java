@@ -49,14 +49,12 @@ public class ResourceList {
 		ZipFile zf;
 		try {
 			zf = new ZipFile(file);
-		} catch (final ZipException e) {
-			throw new Error(e);
 		} catch (final IOException e) {
 			throw new Error(e);
 		}
 		final var e = zf.entries();
 		while (e.hasMoreElements()) {
-			final ZipEntry ze = (ZipEntry) e.nextElement();
+			final ZipEntry ze = e.nextElement();
 			final String fileName = ze.getName();
 			final boolean accept = pattern.matcher(fileName).matches();
 			if (accept) {

@@ -185,5 +185,9 @@ public class Sickles extends Listener<Trifles> {
 				.getWorld()
 				.playSound(root_block.getLocation(), Sound.ITEM_HOE_TILL, SoundCategory.BLOCKS, 1.0f, 2.0f);
 		}
+
+		// Prevent offhand from triggering (e.g. placing torches)
+		event.setUseInteractedBlock(Event.Result.DENY);
+		event.setUseItemInHand(Event.Result.DENY);
 	}
 }

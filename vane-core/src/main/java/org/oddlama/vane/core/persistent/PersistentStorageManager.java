@@ -88,11 +88,10 @@ public class PersistentStorageManager {
 	public void compile(Object owner, Function<String, String> map_name) {
 		// Compile all annotated fields
 		persistent_fields.addAll(
-			getAllFields(owner.getClass())
-				.stream()
-				.filter(this::has_persistent_annotation)
-				.map(f -> compile_field(owner, f, map_name))
-				.collect(Collectors.toList())
+				getAllFields(owner.getClass())
+						.stream()
+						.filter(this::has_persistent_annotation)
+						.map(f -> compile_field(owner, f, map_name)).toList()
 		);
 	}
 
@@ -126,8 +125,7 @@ public class PersistentStorageManager {
 
 		// Check version and migrate if necessary
 		final var version_path = module.storage_path_of("storage_version");
-		final var version_obj = Long.valueOf(json.optString(version_path, "0"));
-		final var version = version_obj == null ? 0 : (long) version_obj;
+		final var version = Long.parseLong(json.optString(version_path, "0"));
 		final var needed_version = module.annotation.storage_version();
 		if (version != needed_version && migrations.size() > 0) {
 			module.log.info("Persistent storage is out of date.");
@@ -192,7 +190,7 @@ public class PersistentStorageManager {
 		// Save to tmp file, then move atomically to prevent corruption.
 		final var tmp_file = new File(file.getAbsolutePath() + ".tmp");
 		try {
-			Files.write(tmp_file.toPath(), json.toString().getBytes(StandardCharsets.UTF_8));
+			Files.writeString(tmp_file.toPath(), json.toString());
 		} catch (IOException e) {
 			module.log.log(Level.SEVERE, "error while saving persistent data to temporary file!", e);
 			return;
@@ -214,7 +212,6 @@ public class PersistentStorageManager {
 				"' with temporary file (very recent changes might be lost)!",
 				e
 			);
-			return;
 		}
 	}
 }

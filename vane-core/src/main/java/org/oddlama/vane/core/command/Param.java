@@ -1,6 +1,6 @@
 package org.oddlama.vane.core.command;
 
-import static org.oddlama.vane.util.Util.namespaced_key;
+import static org.oddlama.vane.util.StorageUtil.namespaced_key;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -315,9 +315,8 @@ public interface Param {
 
 		// Delegate to children
 		var results = get_params()
-			.stream()
-			.map(p -> p.check_accept(sender, args, offset + 1))
-			.collect(Collectors.toList());
+				.stream()
+				.map(p -> p.check_accept(sender, args, offset + 1)).toList();
 
 		// Return first executor result, if any
 		for (var r : results) {

@@ -2,7 +2,7 @@ package org.oddlama.vane.trifles.items;
 
 import static org.oddlama.vane.util.ItemUtil.damage_item;
 import static org.oddlama.vane.util.PlayerUtil.swing_arm;
-import static org.oddlama.vane.util.Util.ms_to_ticks;
+import static org.oddlama.vane.util.Conversions.ms_to_ticks;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -37,6 +37,9 @@ public class Scrolls extends Listener<Trifles> {
 		super(context.group("scrolls", "Several scrolls that allow player teleportation, and related behavior."));
 		scrolls.add(new HomeScroll(get_context()));
 		scrolls.add(new UnstableScroll(get_context()));
+		scrolls.add(new SpawnScroll(get_context()));
+		scrolls.add(new LodestoneScroll(get_context()));
+		scrolls.add(new DeathScroll(get_context()));
 
 		// Accumulate base materials so the cooldown can be applied to all scrolls regardless of base material.
 		for (final var scroll : scrolls) {
@@ -83,7 +86,7 @@ public class Scrolls extends Listener<Trifles> {
 				break;
 		}
 
-		final var to_location = scroll.teleport_location(player, true);
+		final var to_location = scroll.teleport_location(item, player, true);
 		if (to_location == null) {
 			return;
 		}
@@ -122,10 +125,8 @@ public class Scrolls extends Listener<Trifles> {
 		to.getWorld().playSound(to, Sound.BLOCK_END_PORTAL_FRAME_FILL, SoundCategory.PLAYERS, 1.0f, 1.0f);
 
 		// Create particles
-		from.getWorld().spawnParticle(Particle.PORTAL, from.clone().add(0.5, 0.5, 0.5), 50, 0.0, 0.0, 0.0, 1.0);
-		from.getWorld().spawnParticle(Particle.PORTAL, from.clone().add(0.5, 1.5, 0.5), 50, 0.0, 0.0, 0.0, 1.0);
-		to.getWorld().spawnParticle(Particle.PORTAL, to.clone().add(0.5, 0.5, 0.5), 50, 0.0, 0.0, 0.0, 1.0);
-		to.getWorld().spawnParticle(Particle.PORTAL, to.clone().add(0.5, 1.5, 0.5), 50, 0.0, 0.0, 0.0, 1.0);
+		from.getWorld().spawnParticle(Particle.PORTAL, from.clone().add(0.0, 1.0, 0.0), 200, 1.0, 2.0, 1.0, 1.0);
+		to.getWorld().spawnParticle(Particle.END_ROD, to.clone().add(0.0, 1.0, 0.0), 100, 1.0, 2.0, 1.0, 1.0);
 		return true;
 	}
 

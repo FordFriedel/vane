@@ -18,7 +18,7 @@ subprojects {
 	apply(plugin = "java")
 
 	group = "org.oddlama.vane"
-	version = "1.9.6"
+	version = "1.10.1"
 
 	repositories() {
 		mavenCentral()
@@ -42,7 +42,7 @@ subprojects {
 
 // All Paper Plugins + Annotations.
 configure(subprojects.filter {
-	!listOf("vane-waterfall").contains(it.name)
+	!listOf("vane-waterfall", "vane-proxy-core").contains(it.name)
 }) {
 	apply(plugin = "io.papermc.paperweight.userdev")
 
@@ -59,7 +59,7 @@ configure(subprojects.filter {
 
 // All Projects except waterfall and annotations.
 configure(subprojects.filter {
-	!listOf("vane-annotations", "vane-waterfall").contains(it.name)
+	!listOf("vane-annotations", "vane-waterfall", "vane-proxy-core").contains(it.name)
 }) {
 	tasks.create<Copy>("copyJar") {
 		from(tasks.reobfJar)
@@ -98,7 +98,7 @@ configure(subprojects.filter {
 
 // All paper plugins except core.
 configure(subprojects.filter {
-	!listOf("vane-annotations", "vane-core", "vane-waterfall").contains(it.name)
+	!listOf("vane-annotations", "vane-core", "vane-waterfall", "vane-proxy-core").contains(it.name)
 }) {
 	dependencies {
 		// https://imperceptiblethoughts.com/shadow/multi-project/#depending-on-the-shadow-jar-from-another-project
@@ -117,7 +117,7 @@ configure(subprojects.filter {
 }) {
 	dependencies {
 		implementation(group = "us.dynmap", name = "dynmap-api", version = "3.2-SNAPSHOT")
-		implementation(group = "com.github.BlueMap-Minecraft", name = "BlueMapAPI", version = "v1.7.0")
+		implementation(group = "com.github.BlueMap-Minecraft", name = "BlueMapAPI", version = "v2.1.0")
 	}
 }
 

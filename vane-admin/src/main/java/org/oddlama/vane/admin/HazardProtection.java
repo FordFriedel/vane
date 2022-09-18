@@ -72,10 +72,6 @@ public class HazardProtection extends Listener<Admin> {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void on_entity_explode(final EntityExplodeEvent event) {
-		if (event.getEntity() == null) {
-			return;
-		}
-
 		if (disable_explosion(event.getEntityType())) {
 			if (world_rebuild.enabled()) {
 				// Schedule rebuild
@@ -104,14 +100,9 @@ public class HazardProtection extends Listener<Admin> {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void on_block_ignite(final BlockIgniteEvent event) {
-		switch (event.getCause()) {
-			default:
-				return;
-			case LIGHTNING:
-				if (config_disable_lightning_fire) {
-					event.setCancelled(true);
-				}
-				return;
+		if (event.getCause() == BlockIgniteEvent.IgniteCause.LIGHTNING
+				&& config_disable_lightning_fire) {
+			event.setCancelled(true);
 		}
 	}
 

@@ -25,7 +25,7 @@ import org.oddlama.vane.portals.event.PortalDestroyEvent;
 import org.oddlama.vane.portals.event.PortalSelectTargetEvent;
 import org.oddlama.vane.portals.event.PortalUnlinkConsoleEvent;
 import org.oddlama.vane.portals.portal.Portal;
-import org.oddlama.vane.util.Util;
+import org.oddlama.vane.util.StorageUtil;
 
 public class ConsoleMenu extends ModuleComponent<Portals> {
 
@@ -100,7 +100,7 @@ public class ConsoleMenu extends ModuleComponent<Portals> {
 			new TranslatedItemStack<>(
 				ctx,
 				"unlink_console",
-				Util.namespaced_key("vane", "decoration_tnt_1"),
+				StorageUtil.namespaced_key("vane", "decoration_tnt_1"),
 				1,
 				"Used to unlink the current console."
 			);
@@ -108,7 +108,7 @@ public class ConsoleMenu extends ModuleComponent<Portals> {
 			new TranslatedItemStack<>(
 				ctx,
 				"unlink_console_confirm_accept",
-				Util.namespaced_key("vane", "decoration_tnt_1"),
+				StorageUtil.namespaced_key("vane", "decoration_tnt_1"),
 				1,
 				"Used to confirm unlinking the current console."
 			);
@@ -279,9 +279,7 @@ public class ConsoleMenu extends ModuleComponent<Portals> {
 								portal.update_blocks(get_module());
 								return ClickResult.SUCCESS;
 							},
-							player2 -> {
-								menu.open(player2);
-							}
+							player2 -> menu.open(player2)
 						)
 						.tag(new PortalMenuTag(portal.id()))
 						.open(player);
@@ -332,9 +330,7 @@ public class ConsoleMenu extends ModuleComponent<Portals> {
 							return ClickResult.SUCCESS;
 						},
 						item_unlink_console_confirm_cancel.item(),
-						player2 -> {
-							menu.open(player2);
-						}
+						player2 -> menu.open(player2)
 					)
 					.tag(new PortalMenuTag(portal.id()))
 					.open(player);
@@ -367,9 +363,7 @@ public class ConsoleMenu extends ModuleComponent<Portals> {
 							return ClickResult.SUCCESS;
 						},
 						item_destroy_portal_confirm_cancel.item(),
-						player2 -> {
-							menu.open(player2);
-						}
+						player2 -> menu.open(player2)
 					)
 					.tag(new PortalMenuTag(portal.id()))
 					.open(player);

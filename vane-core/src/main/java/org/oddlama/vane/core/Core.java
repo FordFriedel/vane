@@ -1,7 +1,7 @@
 package org.oddlama.vane.core;
 
-import static org.oddlama.vane.util.Util.ms_to_ticks;
-import static org.oddlama.vane.util.Util.read_json_from_url;
+import static org.oddlama.vane.util.Conversions.ms_to_ticks;
+import static org.oddlama.vane.util.IOUtil.read_json_from_url;
 
 import java.io.File;
 import java.io.IOException;
@@ -150,9 +150,7 @@ public class Core extends Module<Core> {
 			schedule_task_timer(this::check_for_update, 1l, ms_to_ticks(2 * 60l * 60l * 1000l));
 		}
 
-		schedule_next_tick(() -> {
-			freeze_registries();
-		});
+		schedule_next_tick(() -> freeze_registries());
 	}
 
 	private void unfreeze_registries() {
@@ -228,7 +226,7 @@ public class Core extends Module<Core> {
 				properties.load(Core.class.getResourceAsStream("/vane-core.properties"));
 				current_version = "v" + properties.getProperty("version");
 			} catch (IOException e) {
-				log.severe("Could not load current version from included properties file: " + e.toString());
+				log.severe("Could not load current version from included properties file: " + e);
 				return;
 			}
 		}
@@ -248,7 +246,7 @@ public class Core extends Module<Core> {
 				log.warning("Get the latest release here: https://github.com/oddlama/vane/releases/latest");
 			}
 		} catch (IOException | JSONException e) {
-			log.warning("Could not check for updates: " + e.toString());
+			log.warning("Could not check for updates: " + e);
 		}
 	}
 

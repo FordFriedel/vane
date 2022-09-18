@@ -1,7 +1,7 @@
 package org.oddlama.vane.core.persistent;
 
 import static org.oddlama.vane.util.MaterialUtil.material_from;
-import static org.oddlama.vane.util.Util.namespaced_key;
+import static org.oddlama.vane.util.StorageUtil.namespaced_key;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -141,7 +141,7 @@ public class PersistentSerializer {
 		// Other types
 		serializers.put(String.class, x -> x);
 		deserializers.put(String.class, x -> x);
-		serializers.put(UUID.class, x -> ((UUID) x).toString());
+		serializers.put(UUID.class, Object::toString);
 		deserializers.put(UUID.class, x -> UUID.fromString((String) x));
 
 		// Bukkit types

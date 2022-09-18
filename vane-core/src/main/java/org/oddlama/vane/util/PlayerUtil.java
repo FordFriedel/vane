@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -30,8 +31,8 @@ public class PlayerUtil {
 		// Set velocity, play sound
 		player.setVelocity(player.getVelocity().add(v));
 		player
-			.getWorld()
-			.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 0.4f, 2.0f);
+				.getWorld()
+				.playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, SoundCategory.PLAYERS, 0.4f, 2.0f);
 	}
 
 	public static void remove_one_item_from_hand(final Player player, final EquipmentSlot hand) {
@@ -86,13 +87,13 @@ public class PlayerUtil {
 		}
 
 		final var leftovers = inventory.removeItem(stacks.toArray(new ItemStack[0]));
-		if (leftovers != null && !leftovers.isEmpty()) {
+		if (!leftovers.isEmpty()) {
 			Bukkit
-				.getLogger()
-				.warning(
-					"[vane] Unexpected leftovers while removing the following items from a player's inventory: " +
-					stacks
-				);
+					.getLogger()
+					.warning(
+							"[vane] Unexpected leftovers while removing the following items from a player's inventory: "
+									+
+									stacks);
 			for (final var l : leftovers.entrySet()) {
 				Bukkit.getLogger().warning("[vane] Leftover: " + l.getKey() + ", amount: " + l.getValue());
 			}
@@ -154,23 +155,21 @@ public class PlayerUtil {
 	}
 
 	public static boolean seed_block(
-		final Player player,
-		final ItemStack used_item,
-		final Block block,
-		final Material plant_type,
-		final Material seed_type
-	) {
+			final Player player,
+			final ItemStack used_item,
+			final Block block,
+			final Material plant_type,
+			final Material seed_type) {
 		// Create block place event for seed to place and check if it gets cancelled
 		final var below = block.getRelative(BlockFace.DOWN);
 		final var place_event = new BlockPlaceEvent(
-			block,
-			below.getState(),
-			below,
-			used_item,
-			player,
-			true,
-			EquipmentSlot.HAND
-		);
+				block,
+				below.getState(),
+				below,
+				used_item,
+				player,
+				true,
+				EquipmentSlot.HAND);
 		Bukkit.getPluginManager().callEvent(place_event);
 		if (place_event.isCancelled()) {
 			return false;
@@ -194,19 +193,18 @@ public class PlayerUtil {
 
 		// Play sound
 		player
-			.getWorld()
-			.playSound(
-				player.getLocation(),
-				seed_type == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT,
-				SoundCategory.BLOCKS,
-				1.0f,
-				1.0f
-			);
+				.getWorld()
+				.playSound(
+						player.getLocation(),
+						seed_type == Material.NETHER_WART ? Sound.ITEM_NETHER_WART_PLANT : Sound.ITEM_CROP_PLANT,
+						SoundCategory.BLOCKS,
+						1.0f,
+						1.0f);
 		return true;
 	}
 
 	public static boolean harvest_plant(final Player player, final Block block) {
-		ItemStack[] drops = null;
+		ItemStack[] drops;
 		switch (block.getType()) {
 			default:
 				return false;
@@ -264,8 +262,6 @@ public class PlayerUtil {
 			case OFF_HAND:
 				player.swingOffHand();
 				break;
-			default:
-				return;
 		}
 	}
 }

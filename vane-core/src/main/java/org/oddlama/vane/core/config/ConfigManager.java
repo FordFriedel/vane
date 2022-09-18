@@ -171,11 +171,10 @@ public class ConfigManager {
 	public void compile(Object owner, Function<String, String> map_name) {
 		// Compile all annotated fields
 		config_fields.addAll(
-			getAllFields(owner.getClass())
-				.stream()
-				.filter(this::has_config_annotation)
-				.map(f -> compile_field(owner, f, map_name))
-				.collect(Collectors.toList())
+				getAllFields(owner.getClass())
+						.stream()
+						.filter(this::has_config_annotation)
+						.map(f -> compile_field(owner, f, map_name)).toList()
 		);
 
 		// Sort fields alphabetically, and by precedence (e.g. put version last and lang first)
@@ -263,7 +262,7 @@ public class ConfigManager {
 		// Save to tmp file, then move atomically to prevent corruption.
 		final var tmp_file = new File(file.getAbsolutePath() + ".tmp");
 		try {
-			Files.write(tmp_file.toPath(), content.getBytes(StandardCharsets.UTF_8));
+			Files.writeString(tmp_file.toPath(), content);
 		} catch (IOException e) {
 			module.log.log(Level.SEVERE, "error while writing config file '" + file + "'", e);
 			return false;

@@ -133,9 +133,7 @@ public class Permission extends Command<Permissions> {
 			.permission_groups.keySet()
 			.stream()
 			.sorted((a, b) -> a.compareTo(b))
-			.forEach(group -> {
-				lang_list_group.send(sender, "§b" + group);
-			});
+			.forEach(group -> lang_list_group.send(sender, "§b" + group));
 	}
 
 	private void list_permissions(CommandSender sender) {
@@ -146,14 +144,12 @@ public class Permission extends Command<Permissions> {
 			.getPermissions()
 			.stream()
 			.sorted((a, b) -> a.getName().compareTo(b.getName()))
-			.forEach(perm -> {
-				lang_list_permission.send(
-					sender,
-					"§d" + perm.getName(),
-					permission_default_value_color_code(perm.getDefault()) + perm.getDefault().toString().toLowerCase(),
-					perm.getDescription()
-				);
-			});
+			.forEach(perm -> lang_list_permission.send(
+				sender,
+				"§d" + perm.getName(),
+				permission_default_value_color_code(perm.getDefault()) + perm.getDefault().toString().toLowerCase(),
+				perm.getDescription()
+			));
 	}
 
 	private void list_permissions_for_player(CommandSender sender, OfflinePlayer offline_player) {
@@ -190,7 +186,7 @@ public class Permission extends Command<Permissions> {
 						lang_list_permission.send(
 							sender,
 							"§d" + perm.getName(),
-							permission_value_color_code(att.getValue()) + String.valueOf(att.getValue()),
+							permission_value_color_code(att.getValue()) + att.getValue(),
 							perm.getDescription()
 						);
 					});
@@ -206,14 +202,14 @@ public class Permission extends Command<Permissions> {
 				lang_list_permission.send(
 					sender,
 					"§d" + p,
-					permission_value_color_code(true) + String.valueOf(true),
+					permission_value_color_code(true) + true,
 					""
 				);
 			} else {
 				lang_list_permission.send(
 					sender,
 					"§d" + perm.getName(),
-					permission_value_color_code(true) + String.valueOf(true),
+					permission_value_color_code(true) + true,
 					perm.getDescription()
 				);
 			}

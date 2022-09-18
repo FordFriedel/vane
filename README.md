@@ -79,12 +79,14 @@ I would like to thank the following projects and people maintaining them:
 - [ProtocolLib](https://github.com/dmulloy2/ProtocolLib) for the awesome protocol layer library.
 - [DynmapCoreAPI](https://github.com/webbukkit/DynmapCoreAPI) (Apache-2.0), dynmap integration
 - [BlueMapAPI](https://github.com/BlueMap-Minecraft/BlueMapAPI) (MIT), [BlueMap](https://bluemap.bluecolored.de/) integration
+- [Quark](https://quarkmod.net) (CC-BY-NC-SA 3.0) Assets and texts for the Slime Bucket
 
 #### Included software
 
-The following software packets will be included in the compilation step:
+The following projects will be included in the compilation step:
 
 - [org.json](https://github.com/stleary/JSON-java) (MIT), Java json implementation
+- [SnakeYAML](https://bitbucket.org/snakeyaml/snakeyaml) (Apache-2.0), Java YAML 1.1 implementation
 - [ronmamo reflections](https://github.com/ronmamo/reflections) (WTFPL), Java reflection helper
 - [PacketWrapper](https://github.com/dmulloy2/PacketWrapper) (LGPL3), only specific parts are included
 - [bStats](https://bstats.org/) (LGPL3), plugin metrics

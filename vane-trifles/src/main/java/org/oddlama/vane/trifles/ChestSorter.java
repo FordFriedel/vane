@@ -23,11 +23,11 @@ import org.oddlama.vane.annotation.config.ConfigLong;
 import org.oddlama.vane.core.Listener;
 import org.oddlama.vane.core.data.CooldownData;
 import org.oddlama.vane.core.module.Context;
-import org.oddlama.vane.util.Util;
+import org.oddlama.vane.util.StorageUtil;
 
 public class ChestSorter extends Listener<Trifles> {
 
-	public static final NamespacedKey LAST_SORT_TIME = Util.namespaced_key("vane_trifles", "last_sort_time");
+	public static final NamespacedKey LAST_SORT_TIME = StorageUtil.namespaced_key("vane_trifles", "last_sort_time");
 
 	@ConfigLong(def = 1000, min = 0, desc = "Chest sorting cooldown in milliseconds.")
 	public long config_cooldown;
@@ -166,7 +166,7 @@ public class ChestSorter extends Listener<Trifles> {
 		final var face = ((FaceAttachable) button_data).getAttachedFace();
 
 		int rx = 0;
-		int ry = 0;
+		int ry;
 		int rz = 0;
 
 		// Determine relative radius rx, ry, rz as seen from the button.

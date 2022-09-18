@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,7 +20,6 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.oddlama.vane.core.Core;
 import org.oddlama.vane.core.Listener;
 import org.oddlama.vane.core.module.Context;
-import org.oddlama.vane.packet.WrapperPlayServerChat;
 
 public class PlayerMessageDelayer extends Listener<Core> {
 
@@ -50,9 +48,7 @@ public class PlayerMessageDelayer extends Listener<Core> {
 
 		// Check for message delaying timeouts every 5 seconds.
 		schedule_task_timer(
-			() -> {
-				check_message_delay_timeout();
-			},
+			() -> check_message_delay_timeout(),
 			5 * 20,
 			5 * 20
 		);
@@ -186,7 +182,7 @@ public class PlayerMessageDelayer extends Listener<Core> {
 			super(
 				PlayerMessageDelayer.this.get_module(),
 				ListenerPriority.HIGHEST,
-				new PacketType[] { PacketType.Play.Server.SYSTEM_CHAT }
+				PacketType.Play.Server.SYSTEM_CHAT
 			);
 		}
 

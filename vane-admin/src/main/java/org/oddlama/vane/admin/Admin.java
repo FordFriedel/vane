@@ -1,23 +1,14 @@
 package org.oddlama.vane.admin;
 
 import org.oddlama.vane.annotation.VaneModule;
-import org.oddlama.vane.annotation.persistent.Persistent;
 import org.oddlama.vane.core.module.Module;
-import org.oddlama.vane.util.LazyLocation;
 
 @VaneModule(name = "admin", bstats = 8638, config_version = 2, lang_version = 2, storage_version = 1)
 public class Admin extends Module<Admin> {
-
-	// Persistent storage
-	@Persistent
-	public LazyLocation storage_spawn_location = null;
-
 	public Admin() {
 		// Create components
 		new org.oddlama.vane.admin.commands.Gamemode(this);
-		new org.oddlama.vane.admin.commands.Setspawn(this);
 		new org.oddlama.vane.admin.commands.SlimeChunk(this);
-		new org.oddlama.vane.admin.commands.Spawn(this);
 		new org.oddlama.vane.admin.commands.Time(this);
 		new org.oddlama.vane.admin.commands.Weather(this);
 

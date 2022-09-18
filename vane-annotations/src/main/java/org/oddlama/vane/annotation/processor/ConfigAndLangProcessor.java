@@ -11,7 +11,6 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
 @SupportedAnnotationTypes(
@@ -88,7 +87,7 @@ public class ConfigAndLangProcessor extends AbstractProcessor {
 	}
 
 	private void verify_type(TypeElement annotation, Element element) {
-		var type = ((VariableElement) element).asType().toString();
+		var type = element.asType().toString();
 		var required_type = field_type_mapping.get(annotation.asType().toString());
 		if (required_type == null) {
 			processingEnv
@@ -101,7 +100,7 @@ public class ConfigAndLangProcessor extends AbstractProcessor {
 					" has no required_type mapping! This is a bug."
 				);
 		} else {
-			if (required_type != "<any>" && !required_type.equals(type)) {
+			if (!required_type.equals("<any>") && !required_type.equals(type)) {
 				processingEnv
 					.getMessager()
 					.printMessage(
@@ -114,7 +113,6 @@ public class ConfigAndLangProcessor extends AbstractProcessor {
 						" but got " +
 						type
 					);
-				return;
 			}
 		}
 	}

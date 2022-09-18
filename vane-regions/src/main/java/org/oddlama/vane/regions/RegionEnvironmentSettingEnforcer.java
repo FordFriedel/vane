@@ -3,10 +3,7 @@ package org.oddlama.vane.regions;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
@@ -57,23 +54,13 @@ public class RegionEnvironmentSettingEnforcer extends Listener<Regions> {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void on_block_explode(final BlockExplodeEvent event) {
 		// Prevent explosions from removing region blocks
-		final var it = event.blockList().iterator();
-		while (it.hasNext()) {
-			if (check_setting_at(it.next(), EnvironmentSetting.EXPLOSIONS, false)) {
-				it.remove();
-			}
-		}
+		event.blockList().removeIf(block -> check_setting_at(block, EnvironmentSetting.EXPLOSIONS, false));
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void on_entity_explode(final EntityExplodeEvent event) {
 		// Prevent explosions from removing region blocks
-		final var it = event.blockList().iterator();
-		while (it.hasNext()) {
-			if (check_setting_at(it.next(), EnvironmentSetting.EXPLOSIONS, false)) {
-				it.remove();
-			}
-		}
+		event.blockList().removeIf(block -> check_setting_at(block, EnvironmentSetting.EXPLOSIONS, false));
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -143,11 +130,8 @@ public class RegionEnvironmentSettingEnforcer extends Listener<Regions> {
 		final var damaged = event.getEntity();
 		final var damager = event.getDamager();
 
-		switch (damaged.getType()) {
-			case PLAYER:
-				break;
-			default:
-				return;
+		if (damaged.getType() != EntityType.PLAYER) {
+			return;
 		}
 
 		final Player player_damaged = (Player) damaged;
@@ -184,7 +168,6 @@ public class RegionEnvironmentSettingEnforcer extends Listener<Regions> {
 					if (check_setting_at(event.getEntity().getLocation(), EnvironmentSetting.EXPLOSIONS, false)) {
 						event.setCancelled(true);
 					}
-					return;
 				}
 		}
 	}

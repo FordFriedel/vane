@@ -14,7 +14,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.RecipeChoice;
 import org.jetbrains.annotations.NotNull;
 import org.oddlama.vane.util.ItemUtil;
-import org.oddlama.vane.util.Util;
+import org.oddlama.vane.util.StorageUtil;
 
 public abstract class RecipeDefinition {
 	public String name;
@@ -28,7 +28,7 @@ public abstract class RecipeDefinition {
 	}
 
 	public NamespacedKey key(final NamespacedKey base_key) {
-		return Util.namespaced_key(base_key.namespace(), base_key.value() + "." + name);
+		return StorageUtil.namespaced_key(base_key.namespace(), base_key.value() + "." + name);
 	}
 
 	public abstract Recipe to_recipe(final NamespacedKey base_key);
@@ -40,7 +40,7 @@ public abstract class RecipeDefinition {
 			throw new IllegalArgumentException("Invalid recipe dictionary: Argument must be a Map<String, Object>, but is " + dict.getClass() + "!");
 		}
 		final var type = ((Map<?,?>)dict).get("type");
-		if (type == null || !(type instanceof String)) {
+		if (!(type instanceof String)) {
 			throw new IllegalArgumentException("Invalid recipe dictionary: recipe type must exist and be a string!");
 		}
 

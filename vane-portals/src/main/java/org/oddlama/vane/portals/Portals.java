@@ -5,8 +5,7 @@ import static org.oddlama.vane.util.ItemUtil.name_item;
 import static org.oddlama.vane.util.Nms.item_handle;
 import static org.oddlama.vane.util.Nms.register_entity;
 import static org.oddlama.vane.util.Nms.spawn;
-import static org.oddlama.vane.util.Util.ms_to_ticks;
-import static org.oddlama.vane.util.Util.namespaced_key;
+import static org.oddlama.vane.util.Conversions.ms_to_ticks;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,6 +74,7 @@ import org.oddlama.vane.portals.portal.Style;
 import net.kyori.adventure.text.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import org.oddlama.vane.util.StorageUtil;
 
 @VaneModule(name = "portals", bstats = 8642, config_version = 3, lang_version = 5, storage_version = 2)
 public class Portals extends Module<Portals> {
@@ -309,7 +309,7 @@ public class Portals extends Module<Portals> {
 				throw new RuntimeException("Invalid style key: '" + style_key + "' is not a valid namespaced key");
 			}
 
-			final var style = new Style(namespaced_key(split[0], split[1]));
+			final var style = new Style(StorageUtil.namespaced_key(split[0], split[1]));
 			v1.forEach((is_active, v2) -> {
 				final boolean active;
 				switch (is_active) {
@@ -325,9 +325,6 @@ public class Portals extends Module<Portals> {
 
 				v2.forEach((portal_block_type, material) -> {
 					final var type = PortalBlock.Type.valueOf(portal_block_type.toUpperCase());
-					if (type == null) {
-						throw new RuntimeException("Invalid portal block type: '" + portal_block_type + "'");
-					}
 					style.set_material(active, type, material);
 				});
 			});
@@ -542,18 +539,10 @@ public class Portals extends Module<Portals> {
 		// Add to acceleration structure
 		final var block = portal_block.block();
 		final var world_id = block.getWorld().getUID();
-		var portal_blocks_in_chunk = portal_blocks_in_chunk_in_world.get(world_id);
-		if (portal_blocks_in_chunk == null) {
-			portal_blocks_in_chunk = new HashMap<Long, Map<Long, PortalBlockLookup>>();
-			portal_blocks_in_chunk_in_world.put(world_id, portal_blocks_in_chunk);
-		}
+		var portal_blocks_in_chunk = portal_blocks_in_chunk_in_world.computeIfAbsent(world_id, k -> new HashMap<>());
 
 		final var chunk_key = block.getChunk().getChunkKey();
-		var block_to_portal_block = portal_blocks_in_chunk.get(chunk_key);
-		if (block_to_portal_block == null) {
-			block_to_portal_block = new HashMap<Long, PortalBlockLookup>();
-			portal_blocks_in_chunk.put(chunk_key, block_to_portal_block);
-		}
+		var block_to_portal_block = portal_blocks_in_chunk.computeIfAbsent(chunk_key, k -> new HashMap<>());
 
 		block_to_portal_block.put(block_key(block), portal_block.lookup(portal.id()));
 	}
@@ -657,9 +646,8 @@ public class Portals extends Module<Portals> {
 		for (final var chunk : chunks_for(portal)) {
 			final var chunk_key = chunk.getChunkKey();
 			final var ticket_counter = chunk_ticket_count.get(chunk_key);
-			if (ticket_counter == null) {
-				continue;
-			} else if (ticket_counter > 1) {
+
+			if (ticket_counter > 1) {
 				chunk_ticket_count.put(chunk_key, ticket_counter - 1);
 			} else if (ticket_counter == 1) {
 				chunk.removePluginChunkTicket(this);
@@ -957,11 +945,11 @@ public class Portals extends Module<Portals> {
 		}
 	}
 
-	public static final NamespacedKey STORAGE_PORTALS = namespaced_key("vane_portals", "portals");
+	public static final NamespacedKey STORAGE_PORTALS = StorageUtil.namespaced_key("vane_portals", "portals");
 
 	public void load_persistent_data(final World world) {
 		final var data = world.getPersistentDataContainer();
-		final var storage_portal_prefix = STORAGE_PORTALS.toString() + ".";
+		final var storage_portal_prefix = STORAGE_PORTALS + ".";
 
 		// Load all currently stored portals.
 		final var pdc_portals = data.getKeys().stream()
@@ -978,7 +966,6 @@ public class Portals extends Module<Portals> {
 				index_portal(portal);
 			} catch (IOException e) {
 				log.log(Level.SEVERE, "error while serializing persistent data!", e);
-				continue;
 			}
 		}
 		log.log(Level.INFO, "Loaded " + pdc_portals.size() + " portals for world " + world.getName() + "(" + world.getUID() + ")");
@@ -1028,7 +1015,7 @@ public class Portals extends Module<Portals> {
 
 	public void update_persistent_data(final World world) {
 		final var data = world.getPersistentDataContainer();
-		final var storage_portal_prefix = STORAGE_PORTALS.toString() + ".";
+		final var storage_portal_prefix = STORAGE_PORTALS + ".";
 
 		// Update invalidated portals
 		portals.values().stream()
@@ -1054,9 +1041,7 @@ public class Portals extends Module<Portals> {
 			.collect(Collectors.toSet());
 
 		// Remove all portals that no longer exist
-		Sets.difference(stored_portals, portals.keySet()).forEach(id -> {
-			data.remove(NamespacedKey.fromString(storage_portal_prefix + id.toString()));
-		});
+		Sets.difference(stored_portals, portals.keySet()).forEach(id -> data.remove(NamespacedKey.fromString(storage_portal_prefix + id.toString())));
 	}
 
 	private class PortalDisableRunnable implements Runnable {
