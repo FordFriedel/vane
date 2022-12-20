@@ -56,19 +56,22 @@ public class Lifesteal extends CustomEnchantment<Enchantments> {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void on_attack(final EntityDamageByEntityEvent event) {
 
-        // TODO
+        // exit if not a player
         if(!(event.getDamager() instanceof Player)) return;
 
         Player wielder = (Player) event.getDamager();
         final var victim = (LivingEntity) event.getEntity();
         final var item = wielder.getEquipment().getItemInMainHand();
         final var level = item.getEnchantmentLevel(this.bukkit());
-        PotionEffect test = new PotionEffect(PotionEffectType.WITHER, 20, 2);
+        PotionEffect wither_effect = new PotionEffect(PotionEffectType.WITHER, 20 * level, 2);
 
+        // exit if wielder does not have lifesteal enchantment
         if (level == 0) return;
 
-        wielder.setHealth(wielder.getHealth() + 2.0);
+        // heal the wielder for half a heart per level
+        wielder.setHealth(wielder.getHealth() + (1.0 * level));
 
-        victim.addPotionEffect(test);
+        // add the wither effect to the victim entity
+        victim.addPotionEffect(wither_effect);
     }
 }
