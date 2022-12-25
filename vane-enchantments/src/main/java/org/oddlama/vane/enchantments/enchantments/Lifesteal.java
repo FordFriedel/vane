@@ -48,8 +48,15 @@ public class Lifesteal extends CustomEnchantment<Enchantments> {
     @Override
     public RecipeList default_recipes() {
         return RecipeList.of(new ShapedRecipeDefinition("generic")
-        .shape("w","w","w")
-        .set_ingredient('w', Material.WITHER_ROSE)
+        // TODO
+        .shape("sfs","tba"," cf")
+        .set_ingredient('f', Material.WITHER_ROSE)
+        .set_ingredient('s', Material.WITHER_SKELETON_SKULL)
+        .set_ingredient('b', "vane_enchantments:ancient_tome_of_knowledge")
+        .set_ingredient('t', Material.TOTEM_OF_UNDYING)
+        .set_ingredient('a',Material.GOLDEN_APPLE)
+        .set_ingredient('c', Material.CAKE)
+        .set_ingredient('f',Material.FLINT)
         .result(on("vane_enchantments:enchanted_ancient_tome_of_knowledge")));
     }
 
@@ -62,7 +69,7 @@ public class Lifesteal extends CustomEnchantment<Enchantments> {
         Player wielder = (Player) event.getDamager();
         final var victim = (LivingEntity) event.getEntity();
         final var item = wielder.getEquipment().getItemInMainHand();
-        final var level = item.getEnchantmentLevel(this.bukkit());
+        final var level = (int) item.getEnchantmentLevel(this.bukkit());
         PotionEffect wither_effect = new PotionEffect(PotionEffectType.WITHER, 20 * level, 2);
 
         // exit if wielder does not have lifesteal enchantment
