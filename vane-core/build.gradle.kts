@@ -1,7 +1,12 @@
-import java.security.MessageDigest;
+import java.security.MessageDigest
 
 plugins {
 	id("com.github.johnrengelman.shadow") version "7.1.0"
+	id("net.kyori.blossom") version "1.2.0" // Text replacement for version numbers
+}
+
+blossom {
+	replaceToken("\$VERSION", project.version)
 }
 
 dependencies {
@@ -10,6 +15,7 @@ dependencies {
 	implementation(group = "org.reflections", name = "reflections", version = "0.10.2")
 	implementation(group = "org.json", name = "json", version = "20200518")
 	implementation(project(":vane-annotations"))
+	compileOnly(group = "maven.modrinth", name = "pl3xmap", version = "1.19.2-310")
 }
 
 val resource_pack_sha1 by lazy {
