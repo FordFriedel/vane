@@ -4,9 +4,13 @@ import static org.oddlama.vane.util.MaterialUtil.is_seeded_plant;
 import static org.oddlama.vane.util.PlayerUtil.harvest_plant;
 import static org.oddlama.vane.util.PlayerUtil.swing_arm;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.oddlama.vane.core.Listener;
@@ -41,5 +45,25 @@ public class HarvestListener extends Listener<Trifles> {
 		if (harvest_plant(player, event.getClickedBlock())) {
 			swing_arm(player, event.getHand());
 		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onEntityInteract(EntityInteractEvent event) {
+		final var entity = event.getEntity();
+
+		//ignore if instance of player
+		if(entity.getType() == EntityType.PLAYER) return;
+
+		final var block = event.getBlock();
+
+		//exit if block is null
+		if(block == null) return;
+
+		//cancel the interaction if blocktype is farmland
+		if(event.getBlock().getType() == Material.FARMLAND) {
+			event.setCancelled(true);
+		}
+		
+		return;	
 	}
 }
