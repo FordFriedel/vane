@@ -4,7 +4,6 @@ import static org.oddlama.vane.util.MaterialUtil.is_seeded_plant;
 import static org.oddlama.vane.util.PlayerUtil.harvest_plant;
 import static org.oddlama.vane.util.PlayerUtil.swing_arm;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
