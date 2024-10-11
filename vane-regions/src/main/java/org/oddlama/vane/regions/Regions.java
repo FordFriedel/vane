@@ -122,7 +122,7 @@ public class Regions extends Module<Regions> {
 	@ConfigBoolean(def = false, desc = "Use economy via VaultAPI as currency provider.")
 	public boolean config_economy_as_currency;
 
-	@ConfigBoolean(def = false, desc = "Enable this to prevent players without the conatiner permission from being able to view chests.")
+	@ConfigBoolean(def = false, desc = "Enable this to prevent players without the container permission from being able to view chests.")
 	public boolean config_prohibit_viewing_containers;
 
 	@ConfigInt(
@@ -184,7 +184,6 @@ public class Regions extends Module<Regions> {
 
 	public RegionDynmapLayer dynmap_layer;
 	public RegionBlueMapLayer blue_map_layer;
-	public RegionPlexMapLayer plexmap_layer;
 
 	public RegionEconomyDelegate economy;
 	public boolean vane_portals_available = false;
@@ -205,7 +204,6 @@ public class Regions extends Module<Regions> {
 		new RegionSelectionListener(this);
 		dynmap_layer = new RegionDynmapLayer(this);
 		blue_map_layer = new RegionBlueMapLayer(this);
-		plexmap_layer = new RegionPlexMapLayer(this);
 
 		// Register admin permission
 		admin_permission =
@@ -281,16 +279,17 @@ public class Regions extends Module<Regions> {
 		return region_selections.get(player.getUniqueId());
 	}
 
-	private static final int visualize_max_particels = 20000;
+	private static final int visualize_max_particles = 20000;
 	private static final int visualize_particles_per_block = 12;
 	private static final double visualize_stddev_compensation = 0.25;
 	private static final DustOptions visualize_dust_invalid = new DustOptions(Color.fromRGB(230, 60, 11), 1.0f);
 	private static final DustOptions visualize_dust_valid = new DustOptions(Color.fromRGB(120, 220, 60), 1.0f);
 
 	private void visualize_edge(final World world, final BlockPos c1, final BlockPos c2, final boolean valid) {
-		// Unfortunately, particle spawns are normal distributed.
+		// Unfortunately, particle spawns are normally distributed.
 		// To still have a good visualization, we need to calculate a stddev that looks
-		// good. Empirically we chose a 1/2 of the radius.
+		// good.
+		// Empirically, we chose a 1/2 of the radius.
 		final double mx = (c1.getX() + c2.getX()) / 2.0 + 0.5;
 		final double my = (c1.getY() + c2.getY()) / 2.0 + 0.5;
 		final double mz = (c1.getZ() + c2.getZ()) / 2.0 + 0.5;
@@ -298,7 +297,7 @@ public class Regions extends Module<Regions> {
 		double dy = Math.abs(c1.getY() - c2.getY());
 		double dz = Math.abs(c1.getZ() - c2.getZ());
 		final double len = dx + dy + dz;
-		final int count = Math.min(visualize_max_particels, (int) (visualize_particles_per_block * len));
+		final int count = Math.min(visualize_max_particles, (int) (visualize_particles_per_block * len));
 
 		// Compensate for using normal distributed particles
 		dx *= visualize_stddev_compensation;
@@ -322,7 +321,7 @@ public class Regions extends Module<Regions> {
 
 		// Spawn colored particles indicating validity
 		world.spawnParticle(
-			Particle.REDSTONE,
+			Particle.DUST,
 			mx,
 			my,
 			mz,
@@ -350,17 +349,17 @@ public class Regions extends Module<Regions> {
 			}
 			final var player = offline_player.getPlayer();
 
-			// Both blocks set
+			// Both blocks are set
 			if (selection.primary == null || selection.secondary == null) {
 				continue;
 			}
 
-			// Worlds match
+			// World match
 			if (!selection.primary.getWorld().equals(selection.secondary.getWorld())) {
 				continue;
 			}
 
-			// Extent is visualizable. Prepare parameters.
+			// Extent can be visualized. Prepare parameters.
 			final var world = selection.primary.getWorld();
 			// Check if selection is valid
 			final var valid = selection.is_valid(player);
@@ -421,7 +420,7 @@ public class Regions extends Module<Regions> {
 			return;
 		}
 
-		// Remove region group from storage
+		// Remove a region group from storage
 		if (storage_region_groups.remove(group.id()) == null) {
 			// Was already removed
 			return;
@@ -522,7 +521,7 @@ public class Regions extends Module<Regions> {
 				}
 			});
 
-		// Remove region from index
+		// Remove a region from index
 		index_remove_region(region);
 
 		// Remove map marker
@@ -532,13 +531,11 @@ public class Regions extends Module<Regions> {
 	public void update_marker(final Region region) {
 		dynmap_layer.update_marker(region);
 		blue_map_layer.update_marker(region);
-		plexmap_layer.update_marker(region);
 	}
 
 	public void remove_marker(final UUID region_id) {
 		dynmap_layer.remove_marker(region_id);
 		blue_map_layer.remove_marker(region_id);
-		plexmap_layer.remove_marker(region_id);
 	}
 
 	private void index_region(final Region region) {
@@ -641,7 +638,7 @@ public class Regions extends Module<Regions> {
 	public boolean may_administrate(final Player player, final RegionGroup group) {
 		return (
 			player.getUniqueId().equals(group.owner()) ||
-			group.get_role(player.getUniqueId()).get_setting(RoleSetting.ADMIN)
+			(group != null && group.get_role(player.getUniqueId()).get_setting(RoleSetting.ADMIN))
 		);
 	}
 
@@ -656,7 +653,7 @@ public class Regions extends Module<Regions> {
 			return get_region_group(region_group_id);
 		}
 
-		// Create and save owners's default group
+		// Create and save owner's default group
 		final var region_group = new RegionGroup("[default] " + owner.getName(), owner_id);
 		add_region_group(region_group);
 

@@ -76,7 +76,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import org.oddlama.vane.util.StorageUtil;
 
-@VaneModule(name = "portals", bstats = 8642, config_version = 3, lang_version = 5, storage_version = 2)
+@VaneModule(name = "portals", bstats = 8642, config_version = 3, lang_version = 6, storage_version = 2)
 public class Portals extends Module<Portals> {
 	// Add (de-)serializers
 	static {
@@ -247,7 +247,6 @@ public class Portals extends Module<Portals> {
 	public PortalConstructor constructor;
 	public PortalDynmapLayer dynmap_layer;
 	public PortalBlueMapLayer blue_map_layer;
-	public PortalPlexMapLayer plexmap_layer;
 
 	public Portals() {
 		register_entities();
@@ -257,9 +256,9 @@ public class Portals extends Module<Portals> {
 		new PortalBlockProtector(this);
 		constructor = new PortalConstructor(this);
 		new PortalTeleporter(this);
+		new EntityMoveProcessor(this);
 		dynmap_layer = new PortalDynmapLayer(this);
 		blue_map_layer = new PortalBlueMapLayer(this);
-		plexmap_layer = new PortalPlexMapLayer(this);
 
 		// Register admin permission
 		admin_permission =
@@ -280,6 +279,7 @@ public class Portals extends Module<Portals> {
 
 	@SuppressWarnings("unchecked")
 	private void register_entities() {
+		get_module().core.unfreeze_registries();
 		register_entity(
 			NamespacedKey.minecraft("item"),
 			namespace(),
@@ -343,7 +343,7 @@ public class Portals extends Module<Portals> {
 		}
 
 		portal_area_materials.clear();
-		// Acquire material set from styles. Will be used to accelerate event checking.
+		// Acquire material set from styles. Will be used to speed up event checking.
 		for (final var style : styles.values()) {
 			portal_area_materials.add(style.material(true, PortalBlock.Type.PORTAL));
 		}
@@ -488,7 +488,7 @@ public class Portals extends Module<Portals> {
 			case PORTAL:     portal_block.block().setType(constructor.config_material_portal_area); break;
 		}
 
-		// Remove console item if block is a console
+		// Remove console item if a block is a console
 		if (portal_block.type() == PortalBlock.Type.CONSOLE) {
 			remove_console_item(portal_block.block());
 		}
@@ -511,7 +511,7 @@ public class Portals extends Module<Portals> {
 		// Spawn effect if not portal area
 		if (portal_block.type() != PortalBlock.Type.PORTAL) {
 			portal_block.block().getWorld()
-				.spawnParticle(Particle.ENCHANTMENT_TABLE, portal_block.block().getLocation().add(0.5, 0.5, 0.5), 50, 0.0, 0.0, 0.0, 1.0);
+				.spawnParticle(Particle.ENCHANT, portal_block.block().getLocation().add(0.5, 0.5, 0.5), 50, 0.0, 0.0, 0.0, 1.0);
 		}
 	}
 
@@ -630,7 +630,7 @@ public class Portals extends Module<Portals> {
 	}
 
 	public void load_portal_chunks(final Portal portal) {
-		// Load chunks and adds a ticket so they get loaded and are kept loaded
+		// Load chunks and adds a ticket, so they get loaded and are kept loaded
 		for (final var chunk : chunks_for(portal)) {
 			final var chunk_key = chunk.getChunkKey();
 			final var ticket_counter = chunk_ticket_count.get(chunk_key);
@@ -688,7 +688,7 @@ public class Portals extends Module<Portals> {
 		allow_unload_portal_chunks(src);
 		allow_unload_portal_chunks(dst);
 
-		// Remove from map
+		// Remove from a map
 		connected_portals.remove(src.id());
 		connected_portals.remove(dst.id());
 
@@ -703,7 +703,7 @@ public class Portals extends Module<Portals> {
 			src.update_blocks(this);
 		}
 
-		// Remove automatic disable task if existing
+		// Remove an automatic disable task if existing
 		stop_disable_task(src, dst);
 	}
 
@@ -816,7 +816,7 @@ public class Portals extends Module<Portals> {
 	}
 
 	public void update_portal_visibility(final Portal portal) {
-		// Replace references to the portal everywhere, if visibility
+		// Replace references to the portal everywhere if visibility
 		// has changed.
 		switch (portal.visibility()) {
 			case PRIVATE:
@@ -829,7 +829,7 @@ public class Portals extends Module<Portals> {
 				}
 				break;
 			case GROUP_INTERNAL:
-				// Remove from portals outside of the group
+				// Remove from portals outside the group
 				for (final var other : portals.values()) {
 					if (Objects.equals(other.target_id(), portal.id()) && !is_in_same_region_group(other, portal)) {
 						other.target_id(null);
@@ -918,13 +918,11 @@ public class Portals extends Module<Portals> {
 	public void update_marker(final Portal portal) {
 		dynmap_layer.update_marker(portal);
 		blue_map_layer.update_marker(portal);
-		plexmap_layer.update_marker(portal);
 	}
 
 	public void remove_marker(final UUID portal_id) {
 		dynmap_layer.remove_marker(portal_id);
 		blue_map_layer.remove_marker(portal_id);
-		plexmap_layer.remove_marker(portal_id);
 	}
 
 	@EventHandler

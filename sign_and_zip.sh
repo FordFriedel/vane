@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env nix-shell
+#!nix-shell -i bash -p bash zip
 
 die() {
     echo "[1;31merror:[m $*" >&2
@@ -15,5 +16,5 @@ echo "[+] Creating all-plugins.zip"
 cd target \
     || die "Could not cd into target/"
 rm all-plugins.zip &>/dev/null
-zip -r all-plugins.zip vane*.jar -x "vane*plexmap*.jar" -x "vane*waterfall*.jar" -x "vane*velocity*.jar" \
+zip -r all-plugins.zip vane*.jar -x "vane*plexmap*.jar" -x "vane*velocity*.jar" \
     || die "Could not create all-plugins.zip"

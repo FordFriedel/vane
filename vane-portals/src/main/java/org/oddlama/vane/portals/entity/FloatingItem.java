@@ -29,8 +29,15 @@ public class FloatingItem extends ItemEntity {
 		setNoGravity(true);
 		//setSneaking(true); // Names would then only visible on direct line of sight BUT much darker and offset by -0.5 in y direction
 		setNeverPickUp();
+		setUnlimitedLifetime();
 		persist = false;
 		noPhysics = true;
+	}
+
+	@Override
+	public boolean isAlive() {
+		// Required to efficiently prevent hoppers and hopper minecarts from picking this up
+		return false;
 	}
 
 	@Override
@@ -92,8 +99,7 @@ public class FloatingItem extends ItemEntity {
 	@Override
 	public void setItem(ItemStack itemStack) {
 		super.setItem(itemStack);
-
-		if (itemStack.hasCustomHoverName()) {
+		if (itemStack.getHoverName().toFlatList().size() > 0) {
 			setCustomNameVisible(true);
 			setCustomName(itemStack.getHoverName());
 		} else setCustomNameVisible(false);

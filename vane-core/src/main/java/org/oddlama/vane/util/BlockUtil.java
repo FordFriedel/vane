@@ -15,7 +15,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Skull;
-import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
+import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -25,9 +25,6 @@ import org.jetbrains.annotations.NotNull;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.game.DebugPackets;
 
 public class BlockUtil {
 
@@ -69,48 +66,6 @@ public class BlockUtil {
 			.getWorld()
 			.dropItem(loc.add(Vector.getRandom().subtract(new Vector(.5, .5, .5)).multiply(0.5)), drop)
 			.setVelocity(Vector.getRandom().add(new Vector(-.5, +.5, -.5)).normalize().multiply(.15));
-	}
-
-	public static void add_debug_block_marker(
-		final World world,
-		final BlockPos pos,
-		final String message,
-		final int color,
-		final int duration
-	) {
-		DebugPackets.sendGameTestAddMarker(Nms.world_handle(world), pos, message, color, duration);
-	}
-
-	public static void add_debug_block_marker(
-		final Player player,
-		final BlockPos pos,
-		final String message,
-		final int color,
-		final int duration
-	) {
-		final var buf = new FriendlyByteBuf(Unpooled.buffer());
-		buf.writeBlockPos(pos);
-		buf.writeInt(color);
-		buf.writeUtf(message);
-		buf.writeInt(duration);
-		Nms
-			.player_handle(player)
-			.connection.send(
-				new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.DEBUG_GAME_TEST_ADD_MARKER, buf)
-			);
-	}
-
-	public static void clear_debug_block_marker(final World world) {
-		DebugPackets.sendGameTestClearPacket(Nms.world_handle(world));
-	}
-
-	public static void clear_debug_block_marker(final Player player) {
-		final var buf = new FriendlyByteBuf(Unpooled.buffer());
-		Nms
-			.player_handle(player)
-			.connection.send(
-				new ClientboundCustomPayloadPacket(ClientboundCustomPayloadPacket.DEBUG_GAME_TEST_CLEAR, buf)
-			);
 	}
 
 	public static List<BlockVector> nearest_blocks_for_radius(int radius) {
@@ -158,14 +113,14 @@ public class BlockUtil {
 			}
 		}
 
-		// We are outside of the radius.
+		// We are outside the radius.
 		return null;
 	}
 
 	public static Block[] adjacent_blocks_3d(final Block root) {
 		final var adjacent = new Block[26];
 
-		// Direct adjacents
+		// Direct adjacent
 		adjacent[0] = root.getRelative(1, 0, 0);
 		adjacent[1] = root.getRelative(-1, 0, 0);
 		adjacent[2] = root.getRelative(0, 0, 1);
@@ -173,7 +128,7 @@ public class BlockUtil {
 		adjacent[4] = root.getRelative(0, 1, 0);
 		adjacent[5] = root.getRelative(0, -1, 0);
 
-		// Edge adjacents
+		// Edge adjacent
 		adjacent[6] = root.getRelative(0, -1, -1);
 		adjacent[7] = root.getRelative(0, -1, 1);
 		adjacent[8] = root.getRelative(0, 1, -1);
@@ -187,7 +142,7 @@ public class BlockUtil {
 		adjacent[16] = root.getRelative(1, -1, 0);
 		adjacent[17] = root.getRelative(1, 1, 0);
 
-		// Corner adjacents
+		// Corner adjacent
 		adjacent[18] = root.getRelative(-1, -1, -1);
 		adjacent[19] = root.getRelative(-1, -1, 1);
 		adjacent[20] = root.getRelative(-1, 1, -1);
@@ -205,13 +160,13 @@ public class BlockUtil {
 			final var block = relative(root_block, relative_pos);
 			final var below = block.getRelative(BlockFace.DOWN);
 
-			// Block below must be farmland and the block itself must be air
+			// The Block below must be farmland and the block itself must be air
 			if (below.getType() == farmland_type && block.getType() == Material.AIR) {
 				return block;
 			}
 		}
 
-		// We are outside of the radius.
+		// We are outside the radius.
 		return null;
 	}
 
@@ -289,7 +244,7 @@ public class BlockUtil {
 			}
 		}
 
-		/** Returns {NORTH,SOUTH}_{EAST,WEST} to indicate the XZ corner. */
+		/** Returns {NORTH, SOUTH}_{EAST, WEST} to indicate the XZ corner. */
 		public BlockFace xz_face() {
 			if (x) {
 				if (z) {
@@ -319,7 +274,7 @@ public class BlockUtil {
 
 	public static class Oct {
 
-		private Vector hit_pos; // Relative to block middle
+		private Vector hit_pos; // Relative to a block middle
 		private Corner corner;
 		private BlockFace face;
 
@@ -343,14 +298,14 @@ public class BlockUtil {
 	}
 
 	public static Oct raytrace_oct(final LivingEntity entity, final Block block) {
-		// Ray trace position and face
+		// Ray-trace position and face
 		final var result = entity.rayTraceBlocks(10.0);
 		if (block == null || result == null || !block.equals(result.getHitBlock())) {
 			return null;
 		}
 
 		// Get in-block hit position and bias the result
-		// a bit inside the clicked face, so we don't get ambigous results.
+		// a bit inside the clicked face, so we don't get ambiguous results.
 		final var block_middle = block.getLocation().toVector().add(new Vector(0.5, 0.5, 0.5));
 		final var hit = result
 			.getHitPosition()
