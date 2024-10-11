@@ -70,13 +70,14 @@ public class LodestoneScroll extends Scroll {
 		}
 
 		final var lodestone_location = get_lodestone_location(scroll);
-		final var lodestone = lodestone_location == null ? null : lodestone_location.getBlock();
+		var lodestone = lodestone_location == null ? null : lodestone_location.getBlock();
 
 		if (imminent_teleport) {
 			if (lodestone_location == null) {
 				lang_teleport_no_bound_lodestone.send_action_bar(player);
 			} else if (lodestone.getType() != Material.LODESTONE) {
 				lang_teleport_missing_lodestone.send_action_bar(player);
+				lodestone = null;
 			}
 		}
 
@@ -85,7 +86,7 @@ public class LodestoneScroll extends Scroll {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void on_player_interact(final PlayerInteractEvent event) {
-		// Skip if no block clicked or the item is allowed to be used (e.g. torches in offhand)
+		// Skip if no block clicked or the item is allowed to be used (e.g., torches in offhand)
 		if (!event.hasBlock() || event.getAction() != Action.RIGHT_CLICK_BLOCK || event.useItemInHand() == Event.Result.ALLOW) {
 			return;
 		}
@@ -101,7 +102,7 @@ public class LodestoneScroll extends Scroll {
 			return;
 		}
 
-		// With a lodestone scroll in main hand
+		// With a lodestone scroll in the main hand
 		final var item = player.getEquipment().getItem(EquipmentSlot.HAND);
 		final var custom_item = get_module().core.item_registry().get(item);
 		if (!(custom_item instanceof LodestoneScroll scroll) || !scroll.enabled()) {
@@ -118,10 +119,10 @@ public class LodestoneScroll extends Scroll {
 
 		// Effects and sound
 		swing_arm(player, event.getHand());
-		block.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, block.getLocation().add(0.5, 2.0, 0.5), 100, 0.1, 0.3, 0.1, 2.0);
+		block.getWorld().spawnParticle(Particle.ENCHANT, block.getLocation().add(0.5, 2.0, 0.5), 100, 0.1, 0.3, 0.1, 2.0);
 		block.getWorld().playSound(block.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.BLOCKS, 1.0f, 3.0f);
 
-		// Prevent offhand from triggering (e.g. placing torches)
+		// Prevent offhand from triggering (e.g., placing torches)
 		event.setUseInteractedBlock(Event.Result.DENY);
 		event.setUseItemInHand(Event.Result.DENY);
 	}
