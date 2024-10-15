@@ -2,6 +2,8 @@ package org.oddlama.vane.trifles;
 
 import org.oddlama.vane.core.Listener;
 import org.oddlama.vane.core.module.Context;
+import org.bukkit.event.entity.EntityRessurectEvent;
+import org.bukkit.entity.LivingEntity;
 
 import net.minecraft.world.entity.LivingEntity;
 
@@ -17,10 +19,7 @@ public class TotemBreakListener extends Listener<Trifles> {
     public void on_totem_break(EntityRessurectEvent event) {
         LivingEntity entity = event.getEntity();
         String message = entity.getScoreboardName() + " nearly died. Point and laugh";
-        return;
+        //Bukkit.broadcast(message);
     }
-
-
-    
     
 }
