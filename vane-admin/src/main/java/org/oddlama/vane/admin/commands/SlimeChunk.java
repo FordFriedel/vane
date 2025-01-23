@@ -1,5 +1,9 @@
 package org.oddlama.vane.admin.commands;
 
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.entity.Player;
 import org.oddlama.vane.admin.Admin;
 import org.oddlama.vane.annotation.command.Name;
@@ -11,25 +15,32 @@ import org.oddlama.vane.core.module.Context;
 @Name("slimechunk")
 public class SlimeChunk extends Command<Admin> {
 
-	@LangMessage
-	private TranslatedMessage lang_slime_chunk_yes;
+    @LangMessage
+    private TranslatedMessage lang_slime_chunk_yes;
 
-	@LangMessage
-	private TranslatedMessage lang_slime_chunk_no;
+    @LangMessage
+    private TranslatedMessage lang_slime_chunk_no;
 
-	public SlimeChunk(Context<Admin> context) {
-		super(context);
-		// Add help
-		params().fixed("help").ignore_case().exec(this::print_help);
-		// Command parameters
-		params().exec_player(this::is_slimechunk);
-	}
+    public SlimeChunk(Context<Admin> context) {
+        super(context);
+    }
 
-	private void is_slimechunk(final Player player) {
-		if (player.getLocation().getChunk().isSlimeChunk()) {
-			lang_slime_chunk_yes.send(player);
-		} else {
-			lang_slime_chunk_no.send(player);
-		}
-	}
+    @Override
+    public LiteralArgumentBuilder<CommandSourceStack> get_command_base() {
+        return super.get_command_base()
+            .requires(stack -> stack.getSender() instanceof Player)
+            .then(help())
+            .executes(ctx -> {
+                is_slimechunk((Player) ctx.getSource().getSender());
+                return SINGLE_SUCCESS;
+            });
+    }
+
+    private void is_slimechunk(final Player player) {
+        if (player.getLocation().getChunk().isSlimeChunk()) {
+            lang_slime_chunk_yes.send(player);
+        } else {
+            lang_slime_chunk_no.send(player);
+        }
+    }
 }

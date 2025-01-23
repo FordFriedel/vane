@@ -1,9 +1,9 @@
 plugins {
-	id("com.github.johnrengelman.shadow") version "7.1.0"
+	id("io.github.goooler.shadow") version "8.1.8"
 }
 
 dependencies {
-	compileOnly(group = "org.json", name = "json", version = "20200518")
+	compileOnly(group = "org.json", name = "json", version = "20250107")
 }
 
 tasks {

@@ -1,8 +1,14 @@
 package org.oddlama.vane.trifles.commands;
 
-import java.util.List;
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static io.papermc.paper.command.brigadier.Commands.argument;
 
-import org.bukkit.Material;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.registry.RegistryKey;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemType;
 import org.bukkit.permissions.PermissionDefault;
 import org.oddlama.vane.annotation.command.Name;
 import org.oddlama.vane.core.command.Command;
@@ -11,14 +17,24 @@ import org.oddlama.vane.trifles.Trifles;
 
 @Name("finditem")
 public class Finditem extends Command<Trifles> {
-	public Finditem(Context<Trifles> context) {
-		// Anyone may use this by default.
-		super(context, PermissionDefault.TRUE);
-		// Add help
-		params().fixed("help").ignore_case().exec(this::print_help);
-		// Command parameters
-		params().choice("material", List.of(Material.values()), m -> m.getKey().toString())
-			.ignore_case()
-			.exec_player(get_module().item_finder::find_item);
-	}
+
+    public Finditem(Context<Trifles> context) {
+        super(context, PermissionDefault.TRUE);
+    }
+
+    @Override
+    public LiteralArgumentBuilder<CommandSourceStack> get_command_base() {
+        return super.get_command_base()
+            .then(help())
+            .then(
+                argument("material", ArgumentTypes.resource(RegistryKey.ITEM)).executes(ctx -> {
+                    get_module()
+                        .item_finder.find_item(
+                            (Player) ctx.getSource().getSender(),
+                            ctx.getArgument("material", ItemType.class).asMaterial()
+                        );
+                    return SINGLE_SUCCESS;
+                })
+            );
+    }
 }

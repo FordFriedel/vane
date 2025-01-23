@@ -1,5 +1,9 @@
 package org.oddlama.vane.regions.commands;
 
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.entity.Player;
 import org.oddlama.vane.annotation.command.Aliases;
 import org.oddlama.vane.annotation.command.Name;
@@ -11,15 +15,22 @@ import org.oddlama.vane.regions.Regions;
 @Aliases({ "regions", "rg" })
 public class Region extends Command<Regions> {
 
-	public Region(Context<Regions> context) {
-		super(context);
-		// Add help
-		params().fixed("help").ignore_case().exec(this::print_help);
-		// Command parameters
-		params().exec_player(this::open_menu);
-	}
+    public Region(Context<Regions> context) {
+        super(context);
+    }
 
-	private void open_menu(Player player) {
-		get_module().menus.main_menu.create(player).open(player);
-	}
+    @Override
+    public LiteralArgumentBuilder<CommandSourceStack> get_command_base() {
+        return super.get_command_base()
+            .then(help())
+            .requires(ctx -> ctx.getSender() instanceof Player)
+            .executes(ctx -> {
+                open_menu((Player) ctx.getSource().getSender());
+                return SINGLE_SUCCESS;
+            });
+    }
+
+    private void open_menu(Player player) {
+        get_module().menus.main_menu.create(player).open(player);
+    }
 }

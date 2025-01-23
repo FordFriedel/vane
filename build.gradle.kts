@@ -1,15 +1,15 @@
 plugins {
 	`java-library`
-	id("io.papermc.paperweight.userdev") version "1.5.5"
-	id("xyz.jpenilla.run-paper") version "1.0.6" // Adds runServer and runMojangMappedServer tasks for testing
+	id("io.papermc.paperweight.userdev") version "2.0.0-beta.13"
+	id("xyz.jpenilla.run-paper") version "2.3.1" // Adds runServer and runMojangMappedServer tasks for testing
 }
 
 dependencies {
-	paperDevBundle("1.20-R0.1-SNAPSHOT")
+	paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
 }
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_17
+	toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 // We don't need to generate an empty `vane.jar`
@@ -23,16 +23,18 @@ subprojects {
 	apply(plugin = "java")
 
 	group = "org.oddlama.vane"
-	version = "1.12.1"
+	version = "1.17.3"
 
-	repositories() {
+	repositories {
+		mavenLocal()
 		mavenCentral()
-		maven("https://papermc.io/repo/repository/maven-public/")
-		//maven("https://repo.dmulloy2.net/nexus/repository/public/")
+		maven("https://repo.papermc.io/repository/maven-public/")
+		maven("https://repo.dmulloy2.net/repository/public/")
 		maven("https://repo.mikeprimm.com/")
 		maven("https://repo.codemc.org/repository/maven-public/")
 		maven("https://jitpack.io")
 		maven("https://api.modrinth.com/maven")
+		maven("https://repo.bluecolored.de/releases")
 	}
 
 	tasks.withType<JavaCompile> {
@@ -41,51 +43,67 @@ subprojects {
 	}
 
 	dependencies {
-		compileOnly(group = "org.jetbrains", name = "annotations", version = "24.0.1")
-		annotationProcessor("org.jetbrains:annotations:24.0.1")
+		compileOnly(group = "org.jetbrains", name = "annotations", version = "26.0.1")
+		annotationProcessor("org.jetbrains:annotations:26.0.1")
 	}
 }
 
 // All Paper Plugins + Annotations.
 configure(subprojects.filter {
-	!listOf("vane-waterfall", "vane-velocity", "vane-proxy-core").contains(it.name)
+	!listOf("vane-velocity", "vane-proxy-core").contains(it.name)
 }) {
 	apply(plugin = "io.papermc.paperweight.userdev")
 
-	dependencies {
-		paperDevBundle("1.20-R0.1-SNAPSHOT")
+	tasks.withType<JavaCompile> {
+		options.compilerArgs.addAll(arrayOf("-Xlint:-this-escape"))
 	}
 
-	tasks {
-		build {
-			dependsOn("reobfJar")
-		}
-	 }
+	dependencies {
+		paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
+	}
+}
+
+// All Projects with jar shadow
+configure(subprojects.filter {
+	listOf("vane-regions", "vane-core", "vane-portals", "vane-regions").contains(it.name)
+}) {
+	tasks.register<Copy>("copyJar") {
+		evaluationDependsOn(project.path)
+		from(tasks.findByPath("shadowJar"))
+		into("${project.rootProject.projectDir}/target")
+		rename("(.+)-dev-all.jar", "$1.jar")
+	}
+}
+
+// All Projects without jar shadow
+configure(subprojects.filter {
+	listOf("vane-admin", "vane-bedtime", "vane-enchantments", "vane-permissions", "vane-trifles").contains(it.name)
+}) {
+	tasks.register<Copy>("copyJar") {
+		from(tasks.jar)
+		into("${project.rootProject.projectDir}/target")
+		rename("(.+)-dev.jar", "$1.jar")
+	}
 }
 
 // All Projects except proxies and annotations.
 configure(subprojects.filter {
-	!listOf("vane-annotations", "vane-waterfall", "vane-velocity", "vane-proxy-core").contains(it.name)
+	!listOf("vane-annotations", "vane-velocity", "vane-proxy-core").contains(it.name)
 }) {
-	tasks.create<Copy>("copyJar") {
-		from(tasks.reobfJar)
-		into("${project.rootProject.projectDir}/target")
-	}
-
 	tasks {
 		build {
 			dependsOn("copyJar")
 		}
 
 		processResources {
-			filesMatching("**/plugin.yml") {
+			filesMatching("**/*plugin.yml") {
 				expand(project.properties)
 			}
 		}
 	}
 
 	dependencies {
-		implementation(group = "com.comphenix.protocol", name = "ProtocolLib", version = "5.0.0-SNAPSHOT")
+		implementation(group = "com.comphenix.protocol", name = "ProtocolLib", version = "5.3.0")
 
 		compileOnly(project(":vane-annotations"))
 		annotationProcessor(project(path = ":vane-annotations", configuration = "reobf"))
@@ -104,11 +122,11 @@ configure(subprojects.filter {
 
 // All paper plugins except core.
 configure(subprojects.filter {
-	!listOf("vane-annotations", "vane-core", "vane-waterfall", "vane-velocity", "vane-proxy-core").contains(it.name)
+	!listOf("vane-annotations", "vane-core", "vane-velocity", "vane-proxy-core").contains(it.name)
 }) {
 	dependencies {
 		// https://imperceptiblethoughts.com/shadow/multi-project/#depending-on-the-shadow-jar-from-another-project
-		// In a multi-project build there may be one project that applies Shadow and another that requires the shadowed
+		// In a multi-project build, there may be one project that applies Shadow and another that requires the shadowed
 		// JAR as a dependency. In this case, use Gradle's normal dependency declaration mechanism to depend on the
 		// shadow configuration of the shadowed project.
 		implementation(project(path = ":vane-core", configuration = "shadow"))
@@ -122,10 +140,8 @@ configure(subprojects.filter {
 	listOf("vane-bedtime", "vane-portals", "vane-regions").contains(it.name)
 }) {
 	dependencies {
-		implementation(group = "us.dynmap", name = "dynmap-api", version = "3.2-SNAPSHOT")
-		implementation(group = "com.github.BlueMap-Minecraft", name = "BlueMapAPI", version = "v2.3.0")
-		implementation(rootProject.project(":vane-plexmap"))
-		compileOnly(group = "maven.modrinth", name = "pl3xmap", version = "1.19.2-310")
+		implementation(group = "us.dynmap", name = "DynmapCoreAPI", version = "3.7-beta-6")
+		implementation(group = "de.bluecolored", name = "bluemap-api", version = "2.7.3")
 	}
 }
 
@@ -133,35 +149,35 @@ runPaper {
 	disablePluginJarDetection()
 }
 
-tasks.create<Delete>("cleanVaneRuntimeTranslations") {
+tasks.register<Delete>("cleanVaneRuntimeTranslations") {
 	group = "run paper"
 	delete(fileTree("run").matching {
 		include("plugins/vane-*/lang-*.yml")
 	})
 }
 
-tasks.create<Delete>("cleanVaneConfigurations") {
+tasks.register<Delete>("cleanVaneConfigurations") {
 	group = "run paper"
 	delete(fileTree("run").matching {
 		include("plugins/vane-*/config.yml")
 	})
 }
 
-tasks.create<Delete>("cleanVaneStorage") {
+tasks.register<Delete>("cleanVaneStorage") {
 	group = "run paper"
 	delete(fileTree("run").matching {
 		include("plugins/vane-*/storage.json")
 	})
 }
 
-tasks.create<Delete>("cleanVane") {
+tasks.register<Delete>("cleanVane") {
 	group = "run paper"
 	delete(fileTree("run").matching {
 		include("plugins/vane-*/")
 	})
 }
 
-tasks.create<Delete>("cleanWorld") {
+tasks.register<Delete>("cleanWorld") {
 	group = "run paper"
 	delete(fileTree("run").matching {
 		include(
