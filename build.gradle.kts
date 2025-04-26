@@ -1,11 +1,11 @@
 plugins {
 	`java-library`
-	id("io.papermc.paperweight.userdev") version "2.0.0-beta.13"
+	id("io.papermc.paperweight.userdev") version "2.0.0-beta.16"
 	id("xyz.jpenilla.run-paper") version "2.3.1" // Adds runServer and runMojangMappedServer tasks for testing
 }
 
 dependencies {
-	paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
+	paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
 }
 
 java {
@@ -23,7 +23,7 @@ subprojects {
 	apply(plugin = "java")
 
 	group = "org.oddlama.vane"
-	version = "1.17.3"
+	version = "1.18.0"
 
 	repositories {
 		mavenLocal()
@@ -59,7 +59,7 @@ configure(subprojects.filter {
 	}
 
 	dependencies {
-		paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
+		paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
 	}
 }
 
@@ -71,7 +71,7 @@ configure(subprojects.filter {
 		evaluationDependsOn(project.path)
 		from(tasks.findByPath("shadowJar"))
 		into("${project.rootProject.projectDir}/target")
-		rename("(.+)-dev-all.jar", "$1.jar")
+		rename("(.+)-all.jar", "$1.jar")
 	}
 }
 
@@ -82,7 +82,6 @@ configure(subprojects.filter {
 	tasks.register<Copy>("copyJar") {
 		from(tasks.jar)
 		into("${project.rootProject.projectDir}/target")
-		rename("(.+)-dev.jar", "$1.jar")
 	}
 }
 
