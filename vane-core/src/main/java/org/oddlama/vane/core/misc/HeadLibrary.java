@@ -3,13 +3,10 @@ package org.oddlama.vane.core.misc;
 import static org.oddlama.vane.util.BlockUtil.drop_naturally;
 import static org.oddlama.vane.util.BlockUtil.texture_from_skull;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
-
+import org.apache.commons.io.IOUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Skull;
 import org.bukkit.event.EventHandler;
@@ -23,7 +20,10 @@ import org.oddlama.vane.core.module.Context;
 
 public class HeadLibrary extends Listener<Core> {
 
-    @ConfigBoolean(def = true, desc = "When a player head is broken by a player that exists in /heads, drop the correctly named item as seen in /heads. You can disable this if it interferes with similarly textured heads from other plugins.")
+    @ConfigBoolean(
+        def = true,
+        desc = "When a player head is broken by a player that exists in /heads, drop the correctly named item as seen in /heads. You can disable this if it interferes with similarly textured heads from other plugins."
+    )
     public boolean config_player_head_drops;
 
     public HeadLibrary(Context<Core> context) {
@@ -31,19 +31,9 @@ public class HeadLibrary extends Listener<Core> {
         // Load a head material library
         get_module().log.info("Loading head library...");
         try {
-            String json = null;
-            try (var input = get_module().getResource("head_library.json")) {
-                if (input != null) {
-                    try (BufferedReader reader = new BufferedReader(
-                            new InputStreamReader(input, StandardCharsets.UTF_8))) {
-                        json = reader.lines().collect(Collectors.joining("\n"));
-                    }
-                }
-            }
-            if (json == null) {
-                throw new IOException("Failed to get contents of resource head_library.json");
-            }
-            HeadMaterialLibrary.load(json);
+            HeadMaterialLibrary.load(
+                IOUtils.toString(get_module().getResource("head_library.json"), StandardCharsets.UTF_8)
+            );
         } catch (IOException e) {
             get_module().log.log(Level.SEVERE, "Error while loading head_library.json! Shutting down.", e);
             get_module().getServer().shutdown();

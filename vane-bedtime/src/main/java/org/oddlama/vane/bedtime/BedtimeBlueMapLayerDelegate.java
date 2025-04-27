@@ -1,6 +1,6 @@
 package org.oddlama.vane.bedtime;
 
-import static org.oddlama.vane.external.apache.commons.text.StringEscapeUtils.escapeHtml4;
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 
 import de.bluecolored.bluemap.api.BlueMapAPI;
 import de.bluecolored.bluemap.api.markers.HtmlMarker;
@@ -85,7 +85,7 @@ public class BedtimeBlueMapLayerDelegate {
         final var marker = HtmlMarker.builder()
             .position(loc.getX(), loc.getY(), loc.getZ())
             .label("Bed for " + player.getName())
-            .html(parent.lang_marker_label.str(escapeHtml4(player.getName())))
+            .html(parent.lang_marker_label.str(escapeHtml(player.getName())))
             .build();
 
         // Existing markers will be overwritten.

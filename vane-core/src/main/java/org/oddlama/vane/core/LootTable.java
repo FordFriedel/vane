@@ -1,7 +1,5 @@
 package org.oddlama.vane.core;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,12 +33,6 @@ public class LootTable {
         return possible_loot;
     }
 
-    public List<LootTableEntry> flat_copy() {
-        List<LootTableEntry> list = new ArrayList<>();
-        possible_loot.values().forEach(list::addAll);
-        return list;
-    }
-
     public void generate_loot(final List<ItemStack> output, final Random random) {
         for (final var set : possible_loot.values()) {
             for (final var loot : set) {
@@ -49,24 +41,6 @@ public class LootTable {
                 }
             }
         }
-    }
-
-    public ItemStack generate_override(final Random random) {
-        double total_chance = 0;
-        final double threshold = random.nextDouble();
-        final List<ItemStack> result_container = new ArrayList<>(1);
-        final var loot_list = flat_copy();
-        Collections.shuffle(loot_list, random);
-        for (final var loot : loot_list) {
-            total_chance += loot.chance;
-            if (total_chance > threshold) {
-                loot.add_sample(result_container, random);
-            }
-            if (!result_container.isEmpty()) {
-                return result_container.get(0);
-            }
-        }
-        return null;
     }
 
     public static class LootTableEntry {
