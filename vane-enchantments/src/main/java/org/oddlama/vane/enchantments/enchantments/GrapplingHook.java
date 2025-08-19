@@ -1,11 +1,11 @@
 package org.oddlama.vane.enchantments.enchantments;
 
-import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import org.oddlama.vane.annotation.config.ConfigDouble;
 import org.oddlama.vane.annotation.config.ConfigDoubleList;
@@ -16,6 +16,8 @@ import org.oddlama.vane.core.config.recipes.ShapedRecipeDefinition;
 import org.oddlama.vane.core.enchantments.CustomEnchantment;
 import org.oddlama.vane.core.module.Context;
 import org.oddlama.vane.enchantments.Enchantments;
+
+import java.util.List;
 
 @VaneEnchantment(
     name = "grappling_hook",
@@ -28,6 +30,7 @@ public class GrapplingHook extends CustomEnchantment<Enchantments> {
 
     // Constant offset to the added velocity, so the player will always move up a little.
     private static final Vector CONSTANT_OFFSET = new Vector(0.0, 0.2, 0.0);
+    private static final double BOUNDING_BOX_RADIUS = 0.2;
 
     @ConfigDouble(
         def = 16.0,
@@ -77,20 +80,20 @@ public class GrapplingHook extends CustomEnchantment<Enchantments> {
             }
         }
 
-        // Grapple when stuck in the ground
         switch (event.getState()) {
-            case FAILED_ATTEMPT:
-                // Assume stuck in ground if velocity is < 0.01
-                if (event.getHook().getVelocity().length() >= 0.01) {
-                    return;
-                }
-
-                // Block must be solid to be hooked
-                if (!event.getHook().getLocation().getBlock().getType().isSolid()) {
-                    return;
-                }
-                break;
             case IN_GROUND:
+                break;
+            case REEL_IN:
+                // Check if the hook is colliding with blocks, worldborder, or entities
+                // We won't activate the grappling hook if it collides with an entity because the event
+                // would instead be in the CAUGHT_ENTITY state
+                double hook_x = event.getHook().getLocation().getX();
+                double hook_y = event.getHook().getLocation().getY();
+                double hook_z = event.getHook().getLocation().getZ();
+                if (!event.getHook().wouldCollideUsing(new BoundingBox(
+                        hook_x - BOUNDING_BOX_RADIUS, hook_y - BOUNDING_BOX_RADIUS, hook_z - BOUNDING_BOX_RADIUS,
+                        hook_x + BOUNDING_BOX_RADIUS, hook_y + BOUNDING_BOX_RADIUS, hook_z + BOUNDING_BOX_RADIUS))
+                ) { return; }
                 break;
             default:
                 return;
@@ -103,16 +106,16 @@ public class GrapplingHook extends CustomEnchantment<Enchantments> {
         // Reset fall distance
         player.setFallDistance(0.0f);
 
+        var vector_multiplier = get_strength(level) * Math.exp(1.0 - attenuation) * attenuation;
+        var adjusted_vector = direction.normalize().multiply(vector_multiplier).add(CONSTANT_OFFSET);
+
+        // If the hook is below the player, set the Y component to 0.0 and only add the constant offset.
+        // This prevents the player from just sliding against the ground when the hook is below them.
+        if (player.getY() - event.getHook().getY() > 0) {
+            adjusted_vector.setY(0.0).add(CONSTANT_OFFSET);
+        }
+
         // Set player velocity
-        player.setVelocity(
-            player
-                .getVelocity()
-                .add(
-                    direction
-                        .normalize()
-                        .multiply(get_strength(level) * Math.exp(1.0 - attenuation) * attenuation)
-                        .add(CONSTANT_OFFSET)
-                )
-        );
+        player.setVelocity(player.getVelocity().add(adjusted_vector));
     }
 }
