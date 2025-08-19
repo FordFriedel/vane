@@ -1,11 +1,11 @@
 plugins {
 	`java-library`
-	id("io.papermc.paperweight.userdev") version "2.0.0-beta.16"
+	id("io.papermc.paperweight.userdev") version "2.0.0-beta.18"
 	id("xyz.jpenilla.run-paper") version "2.3.1" // Adds runServer and runMojangMappedServer tasks for testing
 }
 
 dependencies {
-	paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
+	paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
 }
 
 java {
@@ -23,7 +23,7 @@ subprojects {
 	apply(plugin = "java")
 
 	group = "org.oddlama.vane"
-	version = "1.18.0"
+	version = "1.19.0"
 
 	repositories {
 		mavenLocal()
@@ -43,8 +43,8 @@ subprojects {
 	}
 
 	dependencies {
-		compileOnly(group = "org.jetbrains", name = "annotations", version = "26.0.1")
-		annotationProcessor("org.jetbrains:annotations:26.0.1")
+		compileOnly(group = "org.jetbrains", name = "annotations", version = "26.0.2")
+		annotationProcessor("org.jetbrains:annotations:26.0.2")
 	}
 }
 
@@ -59,13 +59,13 @@ configure(subprojects.filter {
 	}
 
 	dependencies {
-		paperweight.paperDevBundle("1.21.5-R0.1-SNAPSHOT")
+		paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
 	}
 }
 
 // All Projects with jar shadow
 configure(subprojects.filter {
-	listOf("vane-regions", "vane-core", "vane-portals", "vane-regions").contains(it.name)
+	listOf("vane-regions", "vane-core", "vane-portals", "vane-regions", "vane-trifles").contains(it.name)
 }) {
 	tasks.register<Copy>("copyJar") {
 		evaluationDependsOn(project.path)
@@ -77,7 +77,7 @@ configure(subprojects.filter {
 
 // All Projects without jar shadow
 configure(subprojects.filter {
-	listOf("vane-admin", "vane-bedtime", "vane-enchantments", "vane-permissions", "vane-trifles").contains(it.name)
+	listOf("vane-admin", "vane-bedtime", "vane-enchantments", "vane-permissions").contains(it.name)
 }) {
 	tasks.register<Copy>("copyJar") {
 		from(tasks.jar)
@@ -87,22 +87,25 @@ configure(subprojects.filter {
 
 // All Projects except proxies and annotations.
 configure(subprojects.filter {
-	!listOf("vane-annotations", "vane-velocity", "vane-proxy-core").contains(it.name)
+    !listOf("vane-annotations", "vane-velocity", "vane-proxy-core").contains(it.name)
 }) {
-	tasks {
-		build {
-			dependsOn("copyJar")
-		}
+    val projectProperties = project.properties
 
-		processResources {
-			filesMatching("**/*plugin.yml") {
-				expand(project.properties)
-			}
-		}
-	}
+    tasks {
+        build {
+            dependsOn("copyJar")
+        }
+
+        processResources {
+            filesMatching("**/*plugin.yml") {
+                expand(projectProperties)
+            }
+        }
+    }
 
 	dependencies {
-		implementation(group = "com.comphenix.protocol", name = "ProtocolLib", version = "5.3.0")
+		//implementation(group = "com.comphenix.protocol", name = "ProtocolLib", version = "5.4.0")
+        implementation("com.comphenix.protocol:ProtocolLib:5.4.0-20250730.145634-1")
 
 		compileOnly(project(":vane-annotations"))
 		annotationProcessor(project(path = ":vane-annotations", configuration = "reobf"))
@@ -140,7 +143,7 @@ configure(subprojects.filter {
 }) {
 	dependencies {
 		implementation(group = "us.dynmap", name = "DynmapCoreAPI", version = "3.7-beta-6")
-		implementation(group = "de.bluecolored", name = "bluemap-api", version = "2.7.3")
+		implementation(group = "de.bluecolored", name = "bluemap-api", version = "2.7.5")
 	}
 }
 
