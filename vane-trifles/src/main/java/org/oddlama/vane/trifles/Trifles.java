@@ -16,15 +16,16 @@ public class Trifles extends Module<Trifles> {
     public StorageGroup storage_group;
     public boolean packet_events_enabled;
 
-	public Trifles() {
-		final var fast_walking_group = new FastWalkingGroup(this);
-		new FastWalkingListener(fast_walking_group);
-		new DoubleDoorListener(this);
-		new HarvestListener(this);
-		new RepairCostLimiter(this);
-		new RecipeUnlock(this);
-		new ChestSorter(this);
-		item_finder = new ItemFinder(this);
+    public Trifles() {
+        final var fast_walking_group = new FastWalkingGroup(this);
+        new FastWalkingListener(fast_walking_group);
+        new DoubleDoorListener(this);
+		new ItemFrameListener(this);
+        new HarvestListener(this);
+        new RepairCostLimiter(this);
+        new RecipeUnlock(this);
+        new ChestSorter(this);
+        item_finder = new ItemFinder(this);
 
         new org.oddlama.vane.trifles.commands.Heads(this);
         new org.oddlama.vane.trifles.commands.Setspawn(this);
