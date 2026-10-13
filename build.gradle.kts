@@ -113,8 +113,9 @@ configure(vanePlugins) {
 	}
 
 	dependencies {
-		compileOnly(project(":vane-annotations"))
-		annotationProcessor(project(path = ":vane-annotations"))
+		// Select the plain jar explicitly, paperweight adds other variants that make the choice ambiguous
+		compileOnly(project(path = ":vane-annotations", configuration = "runtimeElements"))
+		annotationProcessor(project(path = ":vane-annotations", configuration = "runtimeElements"))
 	}
 }
 
