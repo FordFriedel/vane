@@ -12,7 +12,7 @@
 
 # DO NOT CHANGE! The version of this language file. Used to determine
 # if the file needs to be updated.
-Version: 4
+Version: 5
 # The corresponding language code used in resource packs. Used for
 # resource pack generation. Typically, this is a combination of the
 # language code (ISO 639) and the country code (ISO 3166).
@@ -102,3 +102,6 @@ Scrolls:
   ItemDeathScroll:
     Name: "传送卷轴（死亡点）"
     TeleportNoRecentDeath: "§c你最近没有死亡，或已经使用过死亡卷轴！"
+
+TotemMessage:
+  TotemUsed: "§e%1$s§e 被不死图腾救了一命！"

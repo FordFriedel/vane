@@ -12,7 +12,7 @@
 
 # ¡NO CAMBIAR! La versión de este archivo de idioma. Se utiliza para determinar
 # si el archivo necesita actualizarse.
-Version: 4
+Version: 5
 # El código de idioma correspondiente utilizado en paquetes de recursos. Se utiliza para
 # la generación de paquetes de recursos. Típicamente, esto es una combinación del código de
 # idioma (ISO 639) y el código de país (ISO 3166).
@@ -137,3 +137,6 @@ Scrolls:
     # Se envía cuando se utiliza un pergamino de muerte pero el usuario no ha muerto recientemente o ya ha usado un pergamino de este tipo.
     TeleportNoRecentDeath: "§cNo has muerto recientemente o ya has usado un Pergamino de Muerte."
 
+
+TotemMessage:
+  TotemUsed: "§e¡%1$s§e fue salvado por un Tótem de la inmortalidad!"

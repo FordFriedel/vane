@@ -12,7 +12,7 @@
 
 # DO NOT CHANGE! The version of this language file. Used to determine
 # if the file needs to be updated.
-Version: 4
+Version: 5
 # The corresponding language code used in resource packs. Used for
 # resource pack generation. Typically, this is a combination of the
 # language code (ISO 639) and the country code (ISO 3166).
@@ -136,3 +136,7 @@ Scrolls:
     Name: "Portal Scroll (Death)"
     # Sent when a death scroll is used but the user hasn't died recently or already used a scroll of this type.
     TeleportNoRecentDeath: "§cYou have not died recently, or already used a Death Scroll!"
+
+TotemMessage:
+  # %1$s: player name
+  TotemUsed: "§e%1$s§e was saved by a Totem of Undying!"

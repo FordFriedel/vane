@@ -11,7 +11,7 @@ import org.oddlama.vane.trifles.items.storage.Backpack
 import org.oddlama.vane.trifles.items.storage.Pouch
 import java.util.*
 
-@VaneModule(name = "trifles", bstats = 8644, configVersion = 4, langVersion = 4, storageVersion = 1)
+@VaneModule(name = "trifles", bstats = 8644, configVersion = 4, langVersion = 5, storageVersion = 1)
 /**
  * Main entry point for the `vane-trifles` module.
  */
@@ -42,6 +42,7 @@ class Trifles : Module<Trifles?>() {
         ChestSorter(this)
         PlayerHeadDrops(this)
         CropTrampleProtection(this)
+        TotemMessage(this)
         itemFinder = ItemFinder(this)
 
         Heads(this)

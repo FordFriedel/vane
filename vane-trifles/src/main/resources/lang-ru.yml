@@ -12,7 +12,7 @@
 
 # DO NOT CHANGE! The version of this language file. Used to determine
 # if the file needs to be updated.
-Version: 4
+Version: 5
 # The corresponding language code used in resource packs. Used for
 # resource pack generation. Typically, this is a combination of the
 # language code (ISO 639) and the country code (ISO 3166).
@@ -102,3 +102,6 @@ Scrolls:
   ItemDeathScroll:
     Name: "Свиток телепортации (К месту смерти)"
     TeleportNoRecentDeath: "§cВы ещё не умирали, или уже использовали этот свиток!"
+
+TotemMessage:
+  TotemUsed: "§e%1$s§e спасён тотемом бессмертия!"

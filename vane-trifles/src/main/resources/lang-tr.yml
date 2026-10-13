@@ -12,7 +12,7 @@
 
 # DO NOT CHANGE! The version of this language file. Used to determine
 # if the file needs to be updated.
-Version: 4
+Version: 5
 # The corresponding language code used in resource packs. Used for
 # resource pack generation. Typically, this is a combination of the
 # language code (ISO 639) and the country code (ISO 3166).
@@ -136,3 +136,6 @@ Scrolls:
     Name: "Portal Parşömeni (Ölü)"
     # Sent when a death scroll is used but the user hasn't died recently or already used a scroll of this type.
     TeleportNoRecentDeath: "§cSon zamanlarda ölmediniz veya zaten bir ölüm parşömeni kullandın!"
+
+TotemMessage:
+  TotemUsed: "§e%1$s§e bir Ölümsüzlük Totemi tarafından kurtarıldı!"
