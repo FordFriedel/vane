@@ -25,6 +25,7 @@ public class Trifles extends Module<Trifles> {
         new RepairCostLimiter(this);
         new RecipeUnlock(this);
         new ChestSorter(this);
+        new PlayerHeadDrops(this);
         item_finder = new ItemFinder(this);
 
         new org.oddlama.vane.trifles.commands.Heads(this);
