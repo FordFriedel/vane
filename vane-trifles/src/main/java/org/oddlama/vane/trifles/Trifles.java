@@ -26,6 +26,7 @@ public class Trifles extends Module<Trifles> {
         new RecipeUnlock(this);
         new ChestSorter(this);
         new PlayerHeadDrops(this);
+        new CropTrampleProtection(this);
         item_finder = new ItemFinder(this);
 
         new org.oddlama.vane.trifles.commands.Heads(this);
