@@ -1,5 +1,5 @@
 plugins {
-	id("io.github.goooler.shadow") version "8.1.8"
+	alias(libs.plugins.shadow)
 }
 
 repositories {
@@ -8,8 +8,8 @@ repositories {
 }
 
 dependencies {
-	compileOnly("com.github.retrooper:packetevents-spigot:2.9.4")
-	compileOnly(group = "org.json", name = "json", version = "20250107")
+	compileOnly(libs.packetEvents)
+	compileOnly(libs.json)
 }
 
 tasks {

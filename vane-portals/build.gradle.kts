@@ -1,14 +1,14 @@
 plugins {
-	id("com.gradleup.shadow") version "9.0.0-rc3"
+    alias(libs.plugins.shadow)
 }
 
 dependencies {
-	compileOnly(group = "org.json", name = "json", version = "20250517")
+    compileOnly(libs.json)
 }
 
 tasks {
-	shadowJar {
-		configurations = listOf()
-		relocate("org.json", "org.oddlama.vane.external.json")
-	}
+    shadowJar {
+        configurations = listOf()
+        relocate("org.json", "org.oddlama.vane.external.json")
+    }
 }

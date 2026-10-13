@@ -1,20 +1,24 @@
 plugins {
 	`java-library`
-	id("io.papermc.paperweight.userdev") version "2.0.0-beta.18"
-	id("xyz.jpenilla.run-paper") version "2.3.1" // Adds runServer and runMojangMappedServer tasks for testing
+    alias(libs.plugins.paperweightUserdev)
+	alias(libs.plugins.runPaper) // Adds runServer and runMojangMappedServer tasks for testing
 }
 
 dependencies {
-	paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
+	paperweight.paperDevBundle(rootProject.libs.versions.paper)
 }
 
 java {
-	toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+	toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 // We don't need to generate an empty `vane.jar`
 tasks.withType<Jar> {
 	enabled = false
+}
+
+tasks.runServer {
+    pluginJars(vanePlugins.map { it.tasks.findByName("copyJar")?.inputs?.files })
 }
 
 // Common settings to all subprojects.
@@ -23,13 +27,12 @@ subprojects {
 	apply(plugin = "java")
 
 	group = "org.oddlama.vane"
-	version = "1.19.0"
+	version = "1.21.1"
 
 	repositories {
 		mavenLocal()
 		mavenCentral()
 		maven("https://repo.papermc.io/repository/maven-public/")
-		maven("https://repo.dmulloy2.net/repository/public/")
 		maven("https://repo.mikeprimm.com/")
 		maven("https://repo.codemc.org/repository/maven-public/")
 		maven("https://jitpack.io")
@@ -43,8 +46,8 @@ subprojects {
 	}
 
 	dependencies {
-		compileOnly(group = "org.jetbrains", name = "annotations", version = "26.0.2")
-		annotationProcessor("org.jetbrains:annotations:26.0.2")
+		compileOnly(rootProject.libs.annotations)
+		annotationProcessor(rootProject.libs.annotations)
 	}
 }
 
@@ -54,12 +57,17 @@ configure(subprojects.filter {
 }) {
 	apply(plugin = "io.papermc.paperweight.userdev")
 
-	tasks.withType<JavaCompile> {
+    tasks.withType<JavaCompile> {
 		options.compilerArgs.addAll(arrayOf("-Xlint:-this-escape"))
 	}
 
+    tasks {
+        reobfJar {
+            enabled = false
+        }
+    }
 	dependencies {
-		paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
+		paperweight.paperDevBundle(rootProject.libs.versions.paper)
 	}
 }
 
@@ -86,39 +94,27 @@ configure(subprojects.filter {
 }
 
 // All Projects except proxies and annotations.
-configure(subprojects.filter {
-    !listOf("vane-annotations", "vane-velocity", "vane-proxy-core").contains(it.name)
-}) {
-    val projectProperties = project.properties
+val vanePlugins = subprojects.filter {
+	!listOf("vane-annotations", "vane-velocity", "vane-proxy-core").contains(it.name)
+}
+configure(vanePlugins) {
+	val projectProperties = project.properties
 
-    tasks {
-        build {
-            dependsOn("copyJar")
-        }
+	tasks {
+		build {
+			dependsOn("copyJar")
+		}
 
-        processResources {
-            filesMatching("**/*plugin.yml") {
-                expand(projectProperties)
-            }
-        }
-    }
+		processResources {
+			filesMatching("**/*plugin.yml") {
+				expand(projectProperties)
+			}
+		}
+	}
 
 	dependencies {
-		//implementation(group = "com.comphenix.protocol", name = "ProtocolLib", version = "5.4.0")
-        implementation("com.comphenix.protocol:ProtocolLib:5.4.0-20250730.145634-1")
-
 		compileOnly(project(":vane-annotations"))
-		annotationProcessor(project(path = ":vane-annotations", configuration = "reobf"))
-	}
-
-	rootProject.tasks.runMojangMappedServer {
-		// the input to reobf, is the mojmapped jars.
-		pluginJars(tasks.named<io.papermc.paperweight.tasks.RemapJar>("reobfJar").flatMap { it.inputJar })
-	}
-
-	rootProject.tasks.runServer {
-		// the output is the obfuscated jars.
-		pluginJars(tasks.named<io.papermc.paperweight.tasks.RemapJar>("reobfJar").flatMap { it.outputJar })
+		annotationProcessor(project(path = ":vane-annotations"))
 	}
 }
 
@@ -142,8 +138,8 @@ configure(subprojects.filter {
 	listOf("vane-bedtime", "vane-portals", "vane-regions").contains(it.name)
 }) {
 	dependencies {
-		implementation(group = "us.dynmap", name = "DynmapCoreAPI", version = "3.7-beta-6")
-		implementation(group = "de.bluecolored", name = "bluemap-api", version = "2.7.5")
+		implementation(rootProject.libs.dynmap)
+		implementation(rootProject.libs.bluemap)
 	}
 }
 
