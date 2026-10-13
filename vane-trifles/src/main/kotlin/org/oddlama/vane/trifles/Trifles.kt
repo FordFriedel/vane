@@ -40,6 +40,8 @@ class Trifles : Module<Trifles?>() {
         RepairCostLimiter(this)
         RecipeUnlock(this)
         ChestSorter(this)
+        PlayerHeadDrops(this)
+        CropTrampleProtection(this)
         itemFinder = ItemFinder(this)
 
         Heads(this)
